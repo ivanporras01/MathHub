@@ -68,10 +68,13 @@ async function loginTeacher(req: Request, body: { code?: unknown; remember?: unk
     const seconds = Math.max(1, Math.ceil((windowStart + WINDOW_MS - now) / 1000));
     return json({ error: 'Too many attempts. Please wait up to 15 minutes, then try again.' }, 429, { 'Retry-After': String(seconds) });
   }
-  const code = typeof body.code === 'string' && body.code.length <= 64
-    ? body.code.toUpperCase().replace(/[\s-]/g, '') : '';
-  const received = await sha256(code);
-  if (!/^[A-Z0-9]{12,64}$/.test(code) || !equalHashes(received, expected)) {
+  const rawCode = typeof body.code === 'string' && body.code.length <= 64
+    ? body.code.trim() : '';
+  const code = rawCode.toUpperCase().replace(/[\s-]/g, '');
+  const exactMatch = rawCode.length >= 12 && equalHashes(await sha256(rawCode), expected);
+  const normalizedMatch = /^[A-Z0-9]{12,64}$/.test(code)
+    && equalHashes(await sha256(code), expected);
+  if (!exactMatch && !normalizedMatch) {
     return json({ error: 'That access phrase is not correct. Check the words and numbers, then try again.' }, 401);
   }
   const bytes = crypto.getRandomValues(new Uint8Array(32));
