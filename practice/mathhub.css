@@ -19,7 +19,7 @@ body{background:var(--paper);font-family:'Aptos','Segoe UI',sans-serif;font-size
 
 /* Theme preference applies to student practice and the professor dashboard. */
 :root{color-scheme:light}
-.theme-toggle{position:fixed;right:18px;bottom:18px;z-index:100;display:flex;align-items:center;gap:8px;padding:11px 15px;border-radius:30px;border:1px solid var(--line);background:var(--paper);color:var(--ink);box-shadow:0 3px 15px #0002;font-weight:650}
+.theme-toggle{position:static;flex-shrink:0;white-space:nowrap;display:flex;align-items:center;gap:8px;padding:11px 15px;border-radius:30px;border:1px solid var(--line);background:var(--paper);color:var(--ink);box-shadow:0 3px 15px #0002;font-weight:650}
 html[data-theme="dark"]{color-scheme:dark;--ink:#e0f3ed;--text:#d5e6e1;--muted:#a6bbb4;--line:#3b5554;--paper:#101f23;--white:#1c3035;--green:#82d5b6;--mint:#26473d;--blue:#283d53;--peach:#49372e;--yellow:#453e29;--lavender:#3c3550;--lime:#e9ce89}
 html[data-theme="dark"] body{background:var(--paper);color:var(--text)}
 html[data-theme="dark"] :is(.topbar,.topic-card,.classroom-panel,.student-detail,.teacher-auth,.join-dialog,.teacher-stats>button,.teacher-stats>div,.term-chip,.search-box,.lesson-panel,.practice-panel,.worked-example,.guided-panel,.progress-card){background:#1c3035;border-color:var(--line);box-shadow:none}
@@ -30,4 +30,6 @@ html[data-theme="dark"] .grade-tabs>button.selected{border-color:#83d7b5}
 html[data-theme="dark"] :is(.topic-picture,.topic-art,.fraction-card,.equation-card){color:#173e43}
 html[data-theme="dark"] :is(.fraction-card small,.equation-card small){color:#4d695c!important}
 html[data-theme="dark"] :is(.rule-list,.big-idea,.worked-steps,.guided-active,.hint-box,.watch-out,.feedback,.practice-problem,.problem-statement){background-color:#263b40;color:#dceee8;border-color:#506c6a}
-@media(max-width:550px){.theme-toggle{right:10px;bottom:10px;padding:9px 12px;font-size:12px}.footer{padding-bottom:50px}}
+@media(max-width:550px){.theme-toggle{padding:8px;font-size:12px}.theme-toggle span{display:none}.topbar{gap:10px}.topbar-left{min-width:0}.topbar .breadcrumb{min-width:0}}
+
+.topbar>.topbar-right,.topbar>.teacher-private{margin-left:auto}.theme-toggle{padding:8px 12px;box-shadow:none}.theme-toggle:hover{border-color:var(--green)}

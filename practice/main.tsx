@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sun, Moon } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import MathPortal from '../app/portal';
 import TeacherDashboard from '../app/teacher/teacher-dashboard';
@@ -15,12 +16,14 @@ initialTheme = initialTheme === 'dark' ? 'dark' : 'light';
 document.documentElement.dataset.theme = initialTheme;
 function App() {
   const [theme, setTheme] = useState(initialTheme);
+  const [toolbar, setToolbar] = useState<Element | null>(null);
+  useEffect(() => { setToolbar(document.querySelector('.topbar')); }, []);
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark';
     document.documentElement.dataset.theme = next;
     try { localStorage.setItem('mathhub-theme', next); } catch {}
     setTheme(next);
   }
-  return <><button className="theme-toggle" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>{theme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}<span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span></button>{teacher ? <TeacherDashboard /> : <MathPortal />}</>;
+  return <>{toolbar && createPortal(<button className="theme-toggle" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'} title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>{theme === 'dark' ? <Sun size={18}/> : <Moon size={18}/>}<span>{theme === 'dark' ? 'Light mode' : 'Dark mode'}</span></button>, toolbar)}{teacher ? <TeacherDashboard /> : <MathPortal />}</>;
 }
 createRoot(document.getElementById('root')!).render(<App />);
