@@ -1,9 +1,9 @@
 export type Point=[number,number];
-export type Transform='reflect-x'|'reflect-y'|'rotate-90'|'rotate-180'|'rotate-270'|'translate'|'dilate';
+export type Transform='reflect-x'|'reflect-y'|'reflect-diagonal'|'rotate-90'|'rotate-180'|'rotate-270'|'translate'|'dilate';
 export type RotationDirection='ccw'|'cw';
 export type TransformOptions={dx:number;dy:number;scale:number;direction?:RotationDirection};
 export const TRANSFORMS:{id:Transform;label:string}[]=[
- {id:'reflect-x',label:'Reflect x'},{id:'reflect-y',label:'Reflect y'},
+ {id:'reflect-x',label:'Reflect x'},{id:'reflect-y',label:'Reflect y'},{id:'reflect-diagonal',label:'Reflect y = x'},
  {id:'rotate-90',label:'Rotate 90°'},{id:'rotate-180',label:'Rotate 180°'},
  {id:'rotate-270',label:'Rotate 270°'},{id:'translate',label:'Translate'},{id:'dilate',label:'Dilate'}
 ];
@@ -17,10 +17,10 @@ export const FIGURES:{id:string;label:string;points:Point[]}[]=[
  {id:'hexagon',label:'Hexagon',points:regular(6)}
 ];
 export function transformPoint([x,y]:Point,mode:Transform,{dx,dy,scale,direction='ccw'}:TransformOptions):Point{
- switch(mode){case'reflect-x':return[x,-y];case'reflect-y':return[-x,y];case'rotate-90':return direction==='cw'?[y,-x]:[-y,x];case'rotate-180':return[-x,-y];case'rotate-270':return direction==='cw'?[-y,x]:[y,-x];case'translate':return[x+dx,y+dy];case'dilate':return[x*scale,y*scale];}
+ switch(mode){case'reflect-x':return[x,-y];case'reflect-y':return[-x,y];case'reflect-diagonal':return[y,x];case'rotate-90':return direction==='cw'?[y,-x]:[-y,x];case'rotate-180':return[-x,-y];case'rotate-270':return direction==='cw'?[-y,x]:[y,-x];case'translate':return[x+dx,y+dy];case'dilate':return[x*scale,y*scale];}
 }
 export function transformationRule(mode:Transform,o:TransformOptions){
- switch(mode){case'reflect-x':return'(x, y) → (x, −y)';case'reflect-y':return'(x, y) → (−x, y)';case'rotate-90':return o.direction==='cw'?'(x, y) → (y, −x)':'(x, y) → (−y, x)';case'rotate-180':return'(x, y) → (−x, −y)';case'rotate-270':return o.direction==='cw'?'(x, y) → (−y, x)':'(x, y) → (y, −x)';case'translate':return`(x, y) → (x + (${o.dx}), y + (${o.dy}))`;case'dilate':return`(x, y) → (${o.scale}x, ${o.scale}y)`;}
+ switch(mode){case'reflect-x':return'(x, y) → (x, −y)';case'reflect-y':return'(x, y) → (−x, y)';case'reflect-diagonal':return'(x, y) → (y, x)';case'rotate-90':return o.direction==='cw'?'(x, y) → (y, −x)':'(x, y) → (−y, x)';case'rotate-180':return'(x, y) → (−x, −y)';case'rotate-270':return o.direction==='cw'?'(x, y) → (−y, x)':'(x, y) → (y, −x)';case'translate':return`(x, y) → (x + (${o.dx}), y + (${o.dy}))`;case'dilate':return`(x, y) → (${o.scale}x, ${o.scale}y)`;}
 }
 export function rotationTrace([x,y]:Point,degrees:number,direction:RotationDirection):Point[]{
  const total=degrees*Math.PI/180*(direction==='cw'?-1:1);
