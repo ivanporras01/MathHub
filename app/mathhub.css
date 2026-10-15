@@ -4,3 +4,5 @@
 @media(max-width:800px){.grade-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.term-chip{font-size:11px}.progress-grades button{min-width:auto}.grade-tabs small{font-size:11px}.welcome-line{gap:16px}.hero-copy h2{font-size:38px}}
 @media(max-width:460px){.grade-tabs{gap:8px}.grade-tabs>button{padding:12px 9px;gap:8px}.grade-number{min-width:36px;width:36px;height:36px;font-size:17px}.grade-tabs b{font-size:13px}.grade-tabs small{font-size:10px}.grade-active{display:none}.term-chip{align-self:flex-start}.welcome-line{flex-direction:column;align-items:flex-start}.topbar-right .save-label{display:none}.hero-copy h2{font-size:32px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+.math-tutor{padding:18px;margin:18px 0;border:1px solid #cdddb9;border-radius:16px;background:#f3f9e8;color:#1b372c}.math-tutor>div{display:flex;gap:9px;align-items:center}.math-tutor p{margin:9px 0;line-height:1.5}.math-tutor .text-button{margin-right:15px}
