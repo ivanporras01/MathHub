@@ -17,6 +17,7 @@ const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
 const o={dx:3,dy:-2,scale:2};
 assert.deepEqual(transformPoint([2,3],'reflect-x',o),[2,-3]);
 assert.deepEqual(transformPoint([2,3],'reflect-y',o),[-2,3]);
+assert.deepEqual(transformPoint([2,3],'reflect-diagonal',o),[3,2]);
 assert.deepEqual(transformPoint([2,3],'rotate-90',o),[-3,2]);
 assert.deepEqual(transformPoint([2,3],'rotate-180',o),[-2,-3]);
 assert.deepEqual(transformPoint([2,3],'rotate-270',o),[3,-2]);
