@@ -6,11 +6,11 @@ import {isCorrect,parseAnswer} from './curriculum';
 import {FIGURES,TRANSFORMS,transformPoint,transformationRule,graphExtent,coordinate,rotationTrace,placeVertexLabels,type Point,type Transform,type RotationDirection} from './transformation-model';
 import './transformations-lab.css';
 
-export default function TransformationsLab(){
+export default function TransformationsLab({initialMode='rotate-90'}:{initialMode?:Transform}={}){
  const [figure,setFigure]=useState('triangle'),[vertices,setVertices]=useState<Point[]>(FIGURES[1].points.map(p=>[...p] as Point));
  const [direction,setDirection]=useState<RotationDirection>('ccw');
  const arcId=useId();
- const [mode,setMode]=useState<Transform>('rotate-90'),[dx,setDx]=useState(2),[dy,setDy]=useState(1),[scale,setScale]=useState(2);
+ const [mode,setMode]=useState<Transform>(initialMode),[dx,setDx]=useState(2),[dy,setDy]=useState(1),[scale,setScale]=useState(2);
  const [ox,setOx]=useState(0),[oy,setOy]=useState(0),[selected,setSelected]=useState(0),[shown,setShown]=useState<number|null>(null);
  const [guess,setGuess]=useState(''),[feedback,setFeedback]=useState('');
  const original=vertices.map(([x,y])=>[x+ox,y+oy] as Point),options={dx,dy,scale,direction};
@@ -22,7 +22,7 @@ export default function TransformationsLab(){
  const path=(pts:Point[],close:boolean)=>pts.map(([x,y],i)=>`${i?'L':'M'} ${px(x)} ${py(y)}`).join(' ')+(close?' Z':'');
  const clean=()=>{setGuess('');setFeedback('');};
  function choose(id:string){const base=FIGURES.find(f=>f.id===id);setFigure(id);setVertices((base?.points||FIGURES[1].points).map(p=>[...p] as Point));setSelected(0);setShown(null);setOx(0);setOy(0);clean();}
- function reset(){choose('triangle');setMode('rotate-90');setDirection('ccw');setDx(2);setDy(1);setScale(2);}
+ function reset(){choose('triangle');setMode(initialMode);setDirection('ccw');setDx(2);setDy(1);setScale(2);}
  function editVertex(i:number,axis:number,value:string){const n=Number(value);if(!Number.isFinite(n))return;setVertices(v=>v.map((p,j)=>j===i?p.map((x,k)=>k===axis?Math.max(-6,Math.min(6,n)):x) as Point:p));setShown(null);clean();}
  function stepTo(n:number){const next=Math.max(1,Math.min(image.length,n));setShown(next);setSelected(next-1);clean();}
  function predict(e:React.FormEvent){e.preventDefault();if(parseAnswer(guess)===null){setFeedback('Enter a number, fraction, or decimal.');return;}setFeedback(isCorrect(guess,image[selected][0])?'Correct! You applied the same rule to this vertex.':'Try again. Apply the displayed coordinate rule to the original vertex.');}
@@ -38,7 +38,7 @@ export default function TransformationsLab(){
  <defs><marker id={arcId} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 Z" className="tf-arc-tip"/></marker></defs>
  {ticks.map(n=><g key={n}><path className="lab-grid" d={`M ${px(n)} 55 V 505 M 55 ${py(n)} H 505`}/>{n!==0&&<><text x={px(n)} y="295" textAnchor="middle">{n}</text><text x="271" y={py(n)+4} textAnchor="end">{n}</text></>}</g>)}
  <path className="lab-axis" d="M 55 280 H 505 M 280 55 V 505"/><text x="512" y="271">x</text><text x="289" y="49">y</text><circle cx="280" cy="280" r="3" className="tf-center"/><text x="288" y="310">O (0, 0)</text>
- {mode==='reflect-x'&&<path className="tf-mirror" d="M 55 280 H 505"/>}{mode==='reflect-y'&&<path className="tf-mirror" d="M 280 55 V 505"/>}
+ {mode==='reflect-x'&&<path className="tf-mirror" d="M 55 280 H 505"/>}{mode==='reflect-y'&&<path className="tf-mirror" d="M 280 55 V 505"/>}{mode==='reflect-diagonal'&&<path className="tf-mirror" d="M 55 505 L 505 55"/>}
  {original.length>1&&<path className="tf-original" d={path(original,true)} data-testid="original-outline"/>}
  {image.length>1&&<path className="tf-image" d={path(image,true)} data-testid="image-outline"/>}
  {rotating&&Math.hypot(...focus)>.00001?<path className="tf-rotation-arc" d={path(trace,false)} markerEnd={`url(#${arcId})`}/>:<path className="tf-correspondence" d={`M ${px(focus[0])} ${py(focus[1])} L ${px(target[0])} ${py(target[1])}`}/>}
