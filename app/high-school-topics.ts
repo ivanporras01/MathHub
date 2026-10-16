@@ -115,12 +115,12 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
     "category": "Algebra 1",
     "color": "blue",
     "minutes": 10,
-    "description": "Find a point that satisfies two equations at once.",
-    "idea": "Each linear equation describes a line. Their intersection gives a solution shared by both equations.",
+    "description": "Solve the same system by graphing, substitution, and elimination.",
+    "idea": "Each equation describes its own line. A solution (x, y) lies on BOTH lines. Two lines can cross once, be parallel with no solution, or coincide with infinitely many solutions.",
     "rules": [
-      "Use substitution or elimination to find one variable.",
-      "Find the second variable using an original equation.",
-      "Check both original equations."
+      "Graphing: plot two points for each equation on the same axes and read the intersection (x, y).",
+      "Substitution: replace a variable with an equal expression. Elimination: make coefficients opposites, then add the equations.",
+      "Find both coordinates and check both original equations. A contradiction means no solution; an identity means infinitely many."
     ],
     "mistake": "A point on only one of the lines is not a solution to the system.",
     "visual": "system",
