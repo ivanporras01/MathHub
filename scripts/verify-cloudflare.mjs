@@ -5,7 +5,7 @@ import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
 const native=process.argv.includes('--sites');
 const out=new URL(native?'../work/sites-verification/':'../work/cloudflare-verification/',import.meta.url);await mkdir(out,{recursive:true});
-for(const name of ['curriculum','question-engine','extra-topics','high-school-topics','extra-questions','high-school-questions','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
+for(const name of ['curriculum','question-engine','extra-topics','high-school-topics','extra-questions','high-school-questions','expressions-model','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
 await writeFile(new URL('test-env.mjs',out),"export const env={DB:null,TEACHER_EMAIL:'teacher@example.test'};");
 const {TOPICS,isCorrect,parseAnswer}=await import(new URL('curriculum.mjs',out));
 const {generateQuestion}=await import(new URL('question-engine.mjs',out));
@@ -70,6 +70,14 @@ nq=await next();await call('hint',{questionId:nq.id},ck);answer=await call('answ
 nq=await next();await call('solution',{questionId:nq.id},ck);assert.equal((await call('answer',{questionId:nq.id,answer:String(nq.q.answer)},ck)).status,400);
 const other=await call('join',{firstName:'Other',lastName:'Learner',grade:7});assert.equal((await call('answer',{questionId:nq.id,answer:'5'},other.cookie)).status,404);assert.equal((await call('resolve-help',{studentId},ck)).status,401);
 for(const t of TOPICS){sqlite.prepare('UPDATE questions SET created_at=created_at-61000 WHERE student_id=?').run(studentId);const item=await next(t.id);const result=await call('answer',{questionId:item.id,answer:String(item.q.answer)},ck);assert.equal(result.data.correct,true,`API scoring ${t.id}`);}
+// A question already on a student's screen keeps its old expression and answer after the upgrade.
+const oldExpression=JSON.parse(await readFile(new URL('./fixtures/legacy-expressions.json',import.meta.url),'utf8'))[2];
+sqlite.prepare('INSERT INTO questions(id,student_id,topic_id,seed,level,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').run('legacy-expression',studentId,'9-expressions',oldExpression.seed,oldExpression.level,Date.now(),Date.now());
+const resumedExpression=await call('question',{topicId:'9-expressions'},ck);
+assert.equal(resumedExpression.data.question.expression,oldExpression.question.expression);
+assert.equal((await call('answer',{questionId:'legacy-expression',answer:String(oldExpression.question.answer)},ck)).data.correct,true);
+const upgradedExpression=await next('9-expressions');assert.ok(upgradedExpression.row.seed<0);
+assert.equal((await call('answer',{questionId:upgradedExpression.id,answer:String(upgradedExpression.q.answer)},ck)).data.correct,true);
 let restored=await call('join',{firstName:' ZOË ',lastName:"o'neil",grade:8});assert.equal(restored.data.student.id,studentId);assert.equal(Object.keys(restored.data.progress).length,72);assert.ok(restored.data.progress['6-order'].learned&&restored.data.progress['6-order'].guided);
 await call('activity',{topicId:'7-equations',stage:'guided',grade:7},ck);await call('help',{requested:true,topicId:'7-equations'},ck);await call('activity',{topicId:'8-functions',stage:'learn',grade:8},ck);
 const dashboard=await call('teacher',undefined,'',teacher);assert.equal(dashboard.status,200);const learner=dashboard.data.students.find(s=>s.id===studentId);assert.equal(learner.helpTopic,'7-equations');assert.equal(learner.currentTopic,'8-functions');assert.equal(learner.helpRequested,true);assert.equal(Object.keys(learner.progress).length,72);

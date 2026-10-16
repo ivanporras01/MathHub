@@ -1,5 +1,12 @@
 import type {Question,Step} from './curriculum';
 import {generateExtraQuestion} from './extra-questions';
+import {legacyExpressionQuestion} from './expressions-model';
+// Negative seeds version new Algebra 1 expression questions without changing old records.
+// Previously issued unsigned-seed questions must retain their wording and correct answer.
+export const seedForNewQuestion=(id:string,seed:number)=>id==='9-expressions'?-(seed+1):seed;
+export function generateStoredQuestion(id:string,seed:number,level=1):Question{
+ return id==='9-expressions'&&seed>=0?legacyExpressionQuestion(seed,level):generateQuestion(id,seed,level);
+}
 function rng(seed:number){let s=seed>>>0;return(min:number,max:number)=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return min+Math.floor(s/4294967296*(max-min+1));};}
 const f=(n:number)=>Number(n.toFixed(6)).toString();
 const S=(title:string,math:string,ask:string,answer:number,text='Follow the same operation on the numbers shown.'):Step=>({title,text,math,ask,answer});

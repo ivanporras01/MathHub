@@ -6,17 +6,17 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
     "title": "Simplifying expressions",
     "category": "Algebra 1",
     "color": "mint",
-    "minutes": 10,
-    "description": "Combine matching terms to make an expression easier to read.",
-    "idea": "Terms are pieces separated by addition or subtraction. You can combine terms only when their variable parts match.",
+    "minutes": 20,
+    "description": "Use number properties to simplify signed terms, parentheses, powers, and fractional coefficients.",
+    "idea": "An expression represents a quantity; an equation states equality; an inequality compares quantities. Simplifying rewrites an expression without changing its value. Use the commutative, associative, and distributive properties to justify each step.",
     "rules": [
-      "Identify each term and its sign.",
-      "Group terms with the same variables and powers.",
-      "Add their coefficients and keep the variable part."
+      "Identify signed terms, coefficients, variables, exponents, and constants. Simplify an expression; solve an equation or inequality.",
+      "Distribute every outside factor to every term, working from inner groups outward. Reorder signed terms using the commutative property and group using the associative property.",
+      "Combine coefficients only when the complete variable parts and powers match. Keep x², x, y, and constants separate; use exact fractions and omit zero terms."
     ],
-    "mistake": "4x + 3 is not 7x: a variable term and a constant are not like terms.",
+    "mistake": "Distribute negative signs to EVERY term. 3x² + 2x cannot become 5x². Addition of like terms keeps the exponent; multiplication of powers follows a different rule.",
     "visual": "distribute",
-    "standard": "Introductory practice"
+    "standard": "Progressive Algebra 1 practice"
   },
   {
     "id": "9-equations",

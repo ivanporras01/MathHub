@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:workers';
 import { isCorrect, parseAnswer, topicById } from './curriculum';
-import { generateQuestion } from './question-engine';
+import { generateStoredQuestion as generateQuestion, seedForNewQuestion } from './question-engine';
 import { authenticateTeacher, loginTeacher, logoutTeacher } from './teacher-auth';
 const DAY=86400000;
 const cookieName='mathhub_student';
@@ -90,7 +90,7 @@ export async function handlePost(req:Request,action:string):Promise<Response>{tr
   if(!body.fresh){const active=await db().prepare('SELECT * FROM questions WHERE student_id=? AND topic_id=? AND correct=0 AND revealed=0 ORDER BY created_at DESC LIMIT 1').bind(s.id,topic.id).first<any>();if(active)return json({question:publicQuestion(active)});}
   const recent=await db().prepare('SELECT COUNT(*) count FROM questions WHERE student_id=? AND created_at>?').bind(s.id,now-60000).first<any>();if(recent.count>=40)return fail('Take a moment with your current question, then try again.',429);
   const tally=await db().prepare('SELECT SUM(independent) count FROM questions WHERE student_id=? AND topic_id=?').bind(s.id,topic.id).first<any>();
-  const level=Math.min(3,1+Math.floor((tally?.count||0)/2)),seed=crypto.getRandomValues(new Uint32Array(1))[0],id=crypto.randomUUID();
+  const level=Math.min(3,1+Math.floor((tally?.count||0)/2)),seed=seedForNewQuestion(topic.id,crypto.getRandomValues(new Uint32Array(1))[0]),id=crypto.randomUUID();
   await db().prepare('INSERT INTO questions(id,student_id,topic_id,seed,level,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').bind(id,s.id,topic.id,seed,level,now,now).run();
   return json({question:publicQuestion({id,topic_id:topic.id,seed,level,attempts:0,hint_used:0,correct:0,revealed:0})});
  }

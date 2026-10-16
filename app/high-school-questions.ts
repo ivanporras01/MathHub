@@ -1,11 +1,12 @@
 import type {Question} from './curriculum';
 import {seeded,fmt,step as S,question as Q} from './question-utils';
+import {buildExpressionQuestion} from './expressions-model';
 const sign=(n:number)=>n<0?`− ${Math.abs(n)}`:`+ ${n}`;
 const factor=(n:number)=>`(x ${sign(-n)})`;
 export function generateHighSchoolQuestion(id:string,seed:number,level=1):Question{
  const r=seeded(seed),a=r(2,level>1?9:5),b=r(2,7),c=r(1,5),v=r(0,2);
  switch(id){
- case '9-expressions':{const k=v===0?-b:b,d=c+2,ans=a+k;return Q('Simplify. Enter the coefficient of x.',ans,'Combine x-terms. Keep the constant separate.',[S('Identify like terms','Keep each sign with its term.',`${a}x and ${k}x`,'What is the signed coefficient of the second x-term?',k),S('Combine coefficients','Only matching variable parts combine.',`${a} + (${k}) = ${ans}; result: ${ans}x − ${d}`,'What is the coefficient of x?',ans)],`${a}x ${sign(k)}x − ${d}`);}
+ case '9-expressions':return buildExpressionQuestion(seed,level);
  case '9-equations':{const x=v===0?-c:c,total=a*(x+b)-c;return Q('Solve for x.',x,'Distribute, combine constants, and undo multiplication.',[S('Distribute','Multiply every term in parentheses.',`${a}x + ${a*b} − ${c} = ${total}`,'What constant remains on the left?',a*b-c),S('Move the constant','Subtract the same constant from both sides.',`${a}x = ${total} − (${a*b-c}) = ${a*x}`,'What is the right-hand value?',a*x),S('Divide and check','Divide both sides by the coefficient.',`x = ${x}; check: ${a}(${x} + ${b}) − ${c} = ${total}`,'What is x?',x)],`${a}(x + ${b}) − ${c} = ${total}`);}
  case '9-inequalities':{const k=v===0?-b:b,coef=-a,total=coef*k+c;return Q('The solution is x < k. What is k?',k,'Subtract the constant, then divide by the negative coefficient and reverse the inequality.',[S('Undo addition','Subtract the constant on both sides.',`${coef}x > ${total-c}`,'What is the new right-hand value?',total-c),S('Divide and reverse','Dividing by a negative reverses > to <.',`x < ${k}`,'What is the boundary k?',k),S('Check the direction','A value below the boundary satisfies the inequality.',`x = ${k-1}: ${coef*(k-1)+c} > ${total}`,'What value one below the boundary did we check?',k-1)],`${coef}x + ${c} > ${total}`,undefined,'Enter only the boundary k; the full solution is an inequality.');}
  case '9-functions':{const x=v===0?-c:c,ans=a*x*x-b;return Q(`For f(x) = ${a}x² − ${b}, find f(${x}).`,ans,'Replace x with the input in parentheses. Square before multiplying.',[S('Square the input','A squared negative is positive.',`(${x})² = ${x*x}`,'What is the squared input?',x*x),S('Multiply','Apply the coefficient.',`${a} × ${x*x} = ${a*x*x}`,'What is this product?',a*x*x),S('Subtract','Finish the function rule.',`${a*x*x} − ${b} = ${ans}`,'What is the output?',ans)]);}

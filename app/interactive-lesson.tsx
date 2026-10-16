@@ -4,6 +4,7 @@ import {Slider,Plot,NumberLine} from './lab-diagrams';
 import {specificLab} from './interactive-models';
 import TransformationsLab from './transformations-lab';
 import SystemsLab from './systems-lab';
+import ExpressionsLab from './expressions-lab';
 import {CheckCircle2,Lightbulb,RotateCcw,ChevronRight} from 'lucide-react';
 import {generateQuestion} from './question-engine';
 import {TOPICS,type Topic} from './curriculum';
@@ -14,6 +15,7 @@ export default function InteractiveLesson({topic}:{topic:Topic}){
  const [a,setA]=useState(3),[b,setB]=useState(2),[c,setC]=useState(4),[chosen,setChosen]=useState<number|null>(null),[revealed,setRevealed]=useState(false),[step,setStep]=useState(0);
  if(topic.id==='8-transformations'||topic.id==='11-transformations')return <TransformationsLab/>;
  if(topic.id==='8-systems'||topic.id==='9-systems')return <SystemsLab/>;
+ if(['7-expressions','8-distribute','9-expressions'].includes(topic.id))return <ExpressionsLab advanced={topic.id==='9-expressions'}/>;
  const example=generateQuestion(topic.id,81293+TOPICS.indexOf(topic)*7937,1);
  const visual=topic.visual;
  const currentStep=example.steps[Math.min(step,example.steps.length-1)];

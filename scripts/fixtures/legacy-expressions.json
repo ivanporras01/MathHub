@@ -1,0 +1,158 @@
+[
+  {
+    "seed": 0,
+    "level": 1,
+    "question": {
+      "prompt": "Simplify. Enter the coefficient of x.",
+      "answer": 5,
+      "hint": "Combine x-terms. Keep the constant separate.",
+      "steps": [
+        {
+          "title": "Identify like terms",
+          "text": "Keep each sign with its term.",
+          "math": "2x and 3x",
+          "ask": "What is the signed coefficient of the second x-term?",
+          "answer": 3
+        },
+        {
+          "title": "Combine coefficients",
+          "text": "Only matching variable parts combine.",
+          "math": "2 + (3) = 5; result: 5x − 7",
+          "ask": "What is the coefficient of x?",
+          "answer": 5
+        }
+      ],
+      "expression": "2x + 3x − 7"
+    }
+  },
+  {
+    "seed": 1,
+    "level": 2,
+    "question": {
+      "prompt": "Simplify. Enter the coefficient of x.",
+      "answer": 7,
+      "hint": "Combine x-terms. Keep the constant separate.",
+      "steps": [
+        {
+          "title": "Identify like terms",
+          "text": "Keep each sign with its term.",
+          "math": "3x and 4x",
+          "ask": "What is the signed coefficient of the second x-term?",
+          "answer": 4
+        },
+        {
+          "title": "Combine coefficients",
+          "text": "Only matching variable parts combine.",
+          "math": "3 + (4) = 7; result: 7x − 5",
+          "ask": "What is the coefficient of x?",
+          "answer": 7
+        }
+      ],
+      "expression": "3x + 4x − 5"
+    }
+  },
+  {
+    "seed": 81293,
+    "level": 3,
+    "question": {
+      "prompt": "Simplify. Enter the coefficient of x.",
+      "answer": 14,
+      "hint": "Combine x-terms. Keep the constant separate.",
+      "steps": [
+        {
+          "title": "Identify like terms",
+          "text": "Keep each sign with its term.",
+          "math": "7x and 7x",
+          "ask": "What is the signed coefficient of the second x-term?",
+          "answer": 7
+        },
+        {
+          "title": "Combine coefficients",
+          "text": "Only matching variable parts combine.",
+          "math": "7 + (7) = 14; result: 14x − 7",
+          "ask": "What is the coefficient of x?",
+          "answer": 14
+        }
+      ],
+      "expression": "7x + 7x − 7"
+    }
+  },
+  {
+    "seed": 38472,
+    "level": 1,
+    "question": {
+      "prompt": "Simplify. Enter the coefficient of x.",
+      "answer": 9,
+      "hint": "Combine x-terms. Keep the constant separate.",
+      "steps": [
+        {
+          "title": "Identify like terms",
+          "text": "Keep each sign with its term.",
+          "math": "2x and 7x",
+          "ask": "What is the signed coefficient of the second x-term?",
+          "answer": 7
+        },
+        {
+          "title": "Combine coefficients",
+          "text": "Only matching variable parts combine.",
+          "math": "2 + (7) = 9; result: 9x − 7",
+          "ask": "What is the coefficient of x?",
+          "answer": 9
+        }
+      ],
+      "expression": "2x + 7x − 7"
+    }
+  },
+  {
+    "seed": 2147483647,
+    "level": 2,
+    "question": {
+      "prompt": "Simplify. Enter the coefficient of x.",
+      "answer": 1,
+      "hint": "Combine x-terms. Keep the constant separate.",
+      "steps": [
+        {
+          "title": "Identify like terms",
+          "text": "Keep each sign with its term.",
+          "math": "7x and -6x",
+          "ask": "What is the signed coefficient of the second x-term?",
+          "answer": -6
+        },
+        {
+          "title": "Combine coefficients",
+          "text": "Only matching variable parts combine.",
+          "math": "7 + (-6) = 1; result: 1x − 6",
+          "ask": "What is the coefficient of x?",
+          "answer": 1
+        }
+      ],
+      "expression": "7x − 6x − 6"
+    }
+  },
+  {
+    "seed": 4294967295,
+    "level": 3,
+    "question": {
+      "prompt": "Simplify. Enter the coefficient of x.",
+      "answer": 6,
+      "hint": "Combine x-terms. Keep the constant separate.",
+      "steps": [
+        {
+          "title": "Identify like terms",
+          "text": "Keep each sign with its term.",
+          "math": "3x and 3x",
+          "ask": "What is the signed coefficient of the second x-term?",
+          "answer": 3
+        },
+        {
+          "title": "Combine coefficients",
+          "text": "Only matching variable parts combine.",
+          "math": "3 + (3) = 6; result: 6x − 3",
+          "ask": "What is the coefficient of x?",
+          "answer": 6
+        }
+      ],
+      "expression": "3x + 3x − 3"
+    }
+  }
+]
