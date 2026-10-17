@@ -2,9 +2,11 @@
 import {useState,type ReactNode} from 'react';
 import {Slider,Plot,NumberLine} from './lab-diagrams';
 import {specificLab} from './interactive-models';
+import {conceptLab} from './concept-models';
 import TransformationsLab from './transformations-lab';
 import SystemsLab from './systems-lab';
 import ExpressionsLab from './expressions-lab';
+import ParallelLinesLab from './parallel-lines-lab';
 import {CheckCircle2,Lightbulb,RotateCcw,ChevronRight} from 'lucide-react';
 import {generateQuestion} from './question-engine';
 import {TOPICS,type Topic} from './curriculum';
@@ -13,6 +15,7 @@ import './interactive-lesson.css';
 const round=(n:number)=>Number(n.toFixed(2));
 export default function InteractiveLesson({topic}:{topic:Topic}){
  const [a,setA]=useState(3),[b,setB]=useState(2),[c,setC]=useState(4),[chosen,setChosen]=useState<number|null>(null),[revealed,setRevealed]=useState(false),[step,setStep]=useState(0);
+ if(topic.id==='11-parallel')return <ParallelLinesLab/>;
  if(topic.id==='8-transformations'||topic.id==='11-transformations')return <TransformationsLab/>;
  if(topic.id==='8-systems'||topic.id==='9-systems')return <SystemsLab/>;
  if(['7-expressions','8-distribute','9-expressions'].includes(topic.id))return <ExpressionsLab advanced={topic.id==='9-expressions'}/>;
@@ -23,7 +26,8 @@ export default function InteractiveLesson({topic}:{topic:Topic}){
  let title='See the idea, one step at a time',instruction='Explore this example, then predict the next step.',explanation=topic.idea,question='Which statement describes this topic?',answer=0,choices:string[]=[topic.rules[0],'The order of the steps never matters.'];
  let scene:ReactNode=<div className={`lab-original ${topic.color}`}><TopicArt topic={topic} large/></div>;
  let controls:ReactNode=<div className="lab-step-explorer"><p>{example.prompt}</p>{example.expression&&<div className="lab-equation">{example.expression}</div>}<div className="lab-step-buttons">{example.steps.map((s,i)=><button key={i} className={step===i?'selected':''} onClick={()=>setStep(i)} aria-pressed={step===i}>Step {i+1}</button>)}</div><h3>{currentStep.title}</h3><p>{currentStep.text}</p><div className="lab-equation">{currentStep.math}</div></div>;
- const specific=specificLab(topic,{a,b,c,step,setA:update(setA),setB:update(setB),setC:update(setC),setStep:update(setStep)});
+ const controlsState={a,b,c,step,setA:update(setA),setB:update(setB),setC:update(setC),setStep:update(setStep)};
+ const specific=conceptLab(topic,controlsState)||specificLab(topic,controlsState);
  if(specific){({title,instruction,explanation,question,choices,answer,scene,controls}=specific);
  }else if(visual==='fraction'||visual==='rational'){
   const denominator=c+2,numerator=Math.min(a,denominator),decimal=round(numerator/denominator);

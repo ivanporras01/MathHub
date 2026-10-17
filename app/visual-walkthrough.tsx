@@ -11,16 +11,17 @@ export function ColorMath({text}:{text:string}){
 }
 
 export default function VisualWalkthrough({topic,seed,onComplete}:{topic:Topic;seed:number;onComplete:()=>void}){
+ const [level,setLevel]=useState(1);
  const [variant,setVariant]=useState(0),[index,setIndex]=useState(0),[unlocked,setUnlocked]=useState(0);
  const [input,setInput]=useState(''),[feedback,setFeedback]=useState('');
- const question=generateQuestion(topic.id,seed+variant*104729,1),step=question.steps[index];
+ const question=generateQuestion(topic.id,seed+variant*104729,level),step=question.steps[index];
  const shown=index<unlocked,finished=unlocked===question.steps.length;
  function reveal(){const next=Math.max(unlocked,index+1);setUnlocked(next);if(next===question.steps.length)onComplete();}
  function move(next:number){setIndex(next);setInput('');setFeedback('');}
  function check(e:React.FormEvent){e.preventDefault();if(parseAnswer(input)===null){setFeedback('Enter a number, decimal, or fraction.');return;}if(isCorrect(input,step.answer)){setFeedback('Yes! Compare your reasoning with the explanation below.');reveal();}else setFeedback('Not yet. Try the calculation again, or reveal this step to see the reasoning.');}
  return <article className="lesson-panel visual-walkthrough" aria-label={`Visual worked example: ${topic.title}`}>
   <div className="panel-heading"><div><span className="eyebrow">PREDICT · REVEAL · UNDERSTAND</span><h2>A similar example, one step at a time.</h2></div><span className="pill">Example {variant+1}</span></div>
-  <p>This is a learning example. Explore every step, then solve a different question in practice.</p>
+  <div className="vw-levels"><label htmlFor={`example-level-${topic.id}`}>Example difficulty</label><select id={`example-level-${topic.id}`} value={level} onChange={e=>{setLevel(Number(e.target.value));setIndex(0);setUnlocked(0);setInput('');setFeedback('');}}><option value={1}>1 · Getting started</option><option value={2}>2 · Building confidence</option><option value={3}>3 · Growing stronger</option></select><small>Choose a level, then predict each step.</small></div><p>This is a learning example. Explore every step, then solve a different question in practice.</p>
   <div className="vw-legend" aria-label="Math color key"><span className="vw-number">123 · Numbers</span><span className="vw-variable">x · Variables</span><span className="vw-operation">+ · Operations</span><span className="vw-result-label">✓ · Completed step</span></div>
   <div className="vw-problem"><span className="eyebrow">START WITH THE QUESTION</span><p>{question.prompt}</p>{question.expression&&<ColorMath text={question.expression}/ >}{question.note&&<p className="input-help">{question.note}</p>}</div>
   <nav className="vw-timeline" aria-label="Worked example steps">{question.steps.map((s,i)=><button type="button" key={i} disabled={i>unlocked} aria-current={index===i?'step':undefined} onClick={()=>move(i)} className={index===i?'current':i<unlocked?'done':''}><span>{i<unlocked?<CheckCircle2 size={17}/>:i+1}</span><span>{s.title}</span></button>)}</nav>
