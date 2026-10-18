@@ -1,3 +1,5 @@
+import {readSchoolProfile} from './registration';
+import {emptySupport,validatePayPalUrl} from './support-config';
 import { env } from 'cloudflare:workers';
 import { isCorrect, parseAnswer, topicById } from './curriculum';
 import { generateStoredQuestion as generateQuestion, seedForNewQuestion } from './question-engine';
@@ -16,23 +18,26 @@ async function progressFor(id:string){const results=await db().batch([
  db().prepare('SELECT topic_id, SUM(attempts) attempts, SUM(correct) correct, SUM(independent) independent, SUM(hint_used) hints, MAX(updated_at) updated_at FROM questions WHERE student_id=? GROUP BY topic_id').bind(id)
 ]);const map:Record<string,any>={};for(const row of results[0].results as any[]){map[row.topic_id]={topicId:row.topic_id,learned:!!row.learned,guided:!!row.guided,attempts:0,correct:0,independent:0,hints:0,updatedAt:row.updated_at};}for(const row of results[1].results as any[]){map[row.topic_id]={learned:false,guided:false,...map[row.topic_id],topicId:row.topic_id,attempts:row.attempts||0,correct:row.correct||0,independent:row.independent||0,hints:row.hints||0,updatedAt:row.updated_at};}return map;}
 function studentView(s:any){return{id:s.id,firstName:s.first_name,lastName:s.last_name,grade:s.grade,currentTopic:s.current_topic,currentStage:s.current_stage,helpRequested:!!s.help_requested,helpTopic:s.help_topic};}
+async function supportSettings(){const row=await db().prepare('SELECT * FROM support_settings WHERE id=1').first<any>();return row?{enabled:!!row.enabled,paypalUrl:row.paypal_url,monthlyUrl:row.monthly_url}:{...emptySupport};}
 function publicQuestion(row:any){const q=generateQuestion(row.topic_id,row.seed,row.level);return{id:row.id,prompt:q.prompt,expression:q.expression,unit:q.unit,note:q.note,level:row.level,attempts:row.attempts,hint:row.hint_used?q.hint:undefined,correct:!!row.correct,revealed:!!row.revealed,steps:row.correct||row.revealed?q.steps:undefined};}
 export async function handleGet(req:Request,action:string):Promise<Response>{try{
 
+ if(action==='support'){const settings=await supportSettings();return json(settings.enabled?settings:emptySupport);}
+ if(action==='teacher-support'){if(!await authenticateTeacher(req))return teacherError(req);return json(await supportSettings());}
  if(action==='auth-options')return json({accountLogin:true});
  if(action==='health')return json({ok:true,name:'MathHub',courses:6,teacherConfigured:!!env.TEACHER_CODE_SHA256});
  if(action==='session'){const s=await identity(req);return json(s?{student:studentView(s),progress:await progressFor(s.id)}:{student:null,progress:{}});}
  if(action==='teacher'){
   if(!await authenticateTeacher(req))return teacherError(req);
   const [roster,totals,lessons]=await db().batch([
-   db().prepare('SELECT id,first_name,last_name,grade,current_topic,current_stage,help_requested,help_topic,last_seen,joined_at FROM students ORDER BY last_seen DESC LIMIT 2000'),
+   db().prepare('SELECT id,first_name,last_name,school_grade,school_name,email,email_type,grade,current_topic,current_stage,help_requested,help_topic,last_seen,joined_at FROM students ORDER BY last_seen DESC LIMIT 2000'),
    db().prepare('SELECT student_id,topic_id,SUM(attempts) attempts,SUM(correct) correct,SUM(independent) independent,SUM(hint_used) hints,MAX(updated_at) updated_at FROM questions GROUP BY student_id,topic_id'),
    db().prepare('SELECT student_id,topic_id,learned,guided FROM progress')
   ]);
   const by:Record<string,Record<string,any>>={};
   for(const p of lessons.results as any[]){(by[p.student_id]??={})[p.topic_id]={learned:!!p.learned,guided:!!p.guided,attempts:0,correct:0,independent:0,hints:0};}
   for(const p of totals.results as any[]){const m=by[p.student_id]??={};m[p.topic_id]={...m[p.topic_id],attempts:p.attempts||0,correct:p.correct||0,independent:p.independent||0,hints:p.hints||0,updatedAt:p.updated_at};}
-  return json({students:(roster.results as any[]).map(s=>({...studentView(s),lastSeen:s.last_seen,joinedAt:s.joined_at,progress:by[s.id]||{}})),updatedAt:Date.now()});
+  return json({students:(roster.results as any[]).map(s=>({...studentView(s),schoolGrade:s.school_grade||'',schoolName:s.school_name||'',email:s.email||'',emailType:s.email_type||'',lastSeen:s.last_seen,joinedAt:s.joined_at,progress:by[s.id]||{}})),updatedAt:Date.now()});
  }
  return fail('Page not found.',404);
  }catch(e){console.error('MathHub GET failed',e);return fail('Unable to load progress right now. Please try again.',503);}}
@@ -45,12 +50,40 @@ export async function handlePost(req:Request,action:string):Promise<Response>{tr
   if(origin!==new URL(req.url).origin||req.headers.get('sec-fetch-site')==='cross-site')return fail('Please use the teacher dashboard to submit this request.',403);
   return action==='teacher-login'?await loginTeacher(req,body):await logoutTeacher(req);
  }
+ if(action==='support-settings'){
+  if(!await authenticateTeacher(req))return teacherError(req);
+  if(typeof body.enabled!=='boolean')return fail('Choose whether contributions should be available.');
+  let paypalUrl:string,monthlyUrl:string;
+  try{paypalUrl=validatePayPalUrl(body.paypalUrl);monthlyUrl=validatePayPalUrl(body.monthlyUrl,true);}catch(e){return fail((e as Error).message);}
+  if(body.enabled&&!paypalUrl&&!monthlyUrl)return fail('Add a PayPal payment link before enabling contributions.');
+  await db().prepare('INSERT INTO support_settings(id,enabled,paypal_url,monthly_url,updated_at) VALUES (1,?,?,?,?) ON CONFLICT(id) DO UPDATE SET enabled=excluded.enabled,paypal_url=excluded.paypal_url,monthly_url=excluded.monthly_url,updated_at=excluded.updated_at').bind(body.enabled?1:0,paypalUrl,monthlyUrl,Date.now()).run();
+  return json({ok:true});
+ }
+ if(action==='student-profile'){
+  if(!await authenticateTeacher(req))return teacherError(req);
+  if(typeof body.studentId!=='string')return fail('Choose a student.');
+  const target=await db().prepare('SELECT id FROM students WHERE id=?').bind(body.studentId).first();
+  if(!target)return fail('Student not found.',404);
+  let profile;try{profile=readSchoolProfile(body);}catch(e){return fail((e as Error).message);}
+  await db().prepare('UPDATE students SET school_grade=?,school_name=?,email=?,email_type=? WHERE id=?').bind(profile.schoolGrade||null,profile.schoolName||null,profile.email||null,profile.emailType||null,body.studentId).run();
+  return json({ok:true});
+ }
  if(action==='join'){
   const clean=(v:unknown)=>typeof v==='string'?v.trim().replace(/\s+/g,' ').normalize('NFKC'):'';
   const first=clean(body.firstName),last=clean(body.lastName),valid=(n:string)=>n.length>=1&&n.length<=50&&/^[\p{L}\p{M} .’'\-]+$/u.test(n)&&/\p{L}/u.test(n);
   if(!valid(first)||!valid(last))return fail('Enter your first and last name using letters, spaces, hyphens, or apostrophes.');
   const now=Date.now(),key=(first+'|'+last).toLocaleLowerCase('en-US'),grade=[6,7,8,9,10,11].includes(body.grade)?body.grade:6;
-  await db().prepare('INSERT INTO students (id,name_key,first_name,last_name,grade,joined_at,last_seen) VALUES (?,?,?,?,?,?,?) ON CONFLICT(name_key) DO UPDATE SET last_seen=excluded.last_seen').bind(crypto.randomUUID(),key,first,last,grade,now,now).run();
+  if(body.mode!==undefined&&!['new','returning'].includes(body.mode))return fail('Choose new or returning student.');
+  const existing=await db().prepare('SELECT id FROM students WHERE name_key=?').bind(key).first();
+  if(body.mode==='returning'&&!existing)return fail('No profile was found with that spelling. Check your name or choose New student.',404);
+  if(body.mode==='new'&&existing)return fail('A practice profile already uses this name. Choose Returning student, or ask Mr. Porras if this is not your profile.',409);
+  if(existing){
+   // Names resume learning only. They never reveal or overwrite private school/contact details.
+   await db().prepare('UPDATE students SET last_seen=? WHERE id=?').bind(now,existing.id).run();
+  }else{
+   let profile;try{profile=readSchoolProfile(body,body.mode==='new');}catch(e){return fail((e as Error).message);}
+   await db().prepare('INSERT INTO students (id,name_key,first_name,last_name,grade,school_grade,school_name,email,email_type,joined_at,last_seen) VALUES (?,?,?,?,?,?,?,?,?,?,?)').bind(crypto.randomUUID(),key,first,last,grade,profile.schoolGrade||null,profile.schoolName||null,profile.email||null,profile.emailType||null,now,now).run();
+  }
   const student=await db().prepare('SELECT * FROM students WHERE name_key=?').bind(key).first<any>();
   const token=crypto.randomUUID()+crypto.randomUUID();await db().prepare('INSERT INTO sessions(token_hash,student_id,expires_at) VALUES (?,?,?)').bind(await hash(token),student.id,now+30*DAY).run();
   await db().prepare('DELETE FROM sessions WHERE expires_at<?').bind(now).run();

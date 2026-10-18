@@ -1,6 +1,6 @@
 import { DurableObject } from 'cloudflare:workers';
 import { createHandlers } from './server';
-import { schema } from './schema';
+import {migrateClassroom} from './migrations';
 
 interface Env {
   CLASSROOM: DurableObjectNamespace<MathClassroom>;
@@ -32,13 +32,7 @@ export class MathClassroom extends DurableObject<Env> {
 
   constructor(ctx: DurableObjectState, env: Env) {
     super(ctx, env);
-    ctx.storage.transactionSync(() => {
-      ctx.storage.sql.exec('CREATE TABLE IF NOT EXISTS schema_versions (version INTEGER PRIMARY KEY)');
-      if (!ctx.storage.sql.exec('SELECT version FROM schema_versions WHERE version=1').toArray().length) {
-        for (const statement of schema.split(';').map(s => s.trim()).filter(Boolean)) ctx.storage.sql.exec(statement);
-        ctx.storage.sql.exec('INSERT INTO schema_versions (version) VALUES (1)');
-      }
-    });
+    migrateClassroom(ctx.storage);
     const DB = {
       prepare: (sql: string) => new Statement(ctx.storage, sql),
       batch: async (statements: Statement[]) => ctx.storage.transactionSync(() => statements.map(s => s.execute())),

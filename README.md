@@ -4,7 +4,7 @@ An independent MathHub classroom with six courses and 72 original introductory p
 
 ## Student access and progress
 
-Students join with first and last names. Returning with the same normalized spelling restores the same profile and saved progress across devices. Students with identical full names need distinct name variations agreed with Mr. Porras. Sign out on shared devices. These name-based profiles support practice; they do not verify identity.
+New students provide first and last names, their school grade, and school name; email is optional, with a student/parent contact designation. Returning students use the Returning student tab: the same normalized spelling restores the same profile and saved progress across devices. School grade is independent of the selected math course. School/contact fields are returned only to the authenticated professor, never to name-based student sessions. Only the professor can edit these details, including for older profiles. Students under 13 are directed to seek adult help and use a parent/guardian email; this guidance does not verify age or parental consent. Students with identical full names need distinct name variations agreed with Mr. Porras. Sign out on shared devices. These name-based profiles support practice; they do not verify identity.
 
 Mastery requires the Learn and Guided stages plus five independent first-try correct answers. Supported answers still count as correct practice. Activity indicates a recent visible-page heartbeat, not verified attention.
 
@@ -12,25 +12,25 @@ Mastery requires the Learn and Guided stages plus five independent first-try cor
 
 Open `/teacher`. Use the private professor access phrase. Capitalization, spaces, and hyphens are ignored. Sessions last eight hours, or 30 days when the personal-device checkbox is selected. Secure HttpOnly cookies, hashed server sessions, expiry, sign-out, rotation, and persistent login limits protect the dashboard. Never commit real credentials or their hashes.
 
-The dashboard provides course and activity filters, topic progress, help requests, CSV export, a student-link copy button, and student removal with confirmation. Removing a student deletes that profile and its records, leaving other students intact.
+The dashboard provides name/school/contact search, course and activity filters, private school/contact editing, topic progress, help requests, CSV export including school details, a student-link copy button, and student removal with confirmation. Removing a student deletes that profile and its records, leaving other students intact.
 
 The Cloudflare deployment uses the professor phrase and ignores caller-supplied identity headers. The original optional Sites adapter is retained in the source, but this repository has no Sites project identity or shared deployment manifest.
 
 ## Hosting
 
-This repository is `ivanporras01/MathHub`, with its own `main` branch and history. It is an independent project. Production secrets are configured through Cloudflare, never in source. The Worker is named `mathhub`; its Durable Object namespace and records belong to that Worker. MathPath is not a dependency.
+This repository is `ivanporras01/MathHub`, with its own `main` branch and history. It is an independent project. Production secrets are configured through Cloudflare, never in source. The Worker is named `mathhub-porras`; its Durable Object namespace and records belong to that Worker. MathPath is not a dependency.
 
 | Resource | MathHub configuration |
 | --- | --- |
 | GitHub repository | `ivanporras01/MathHub` |
 | Production branch | `main` |
-| Cloudflare Worker | `mathhub` |
+| Cloudflare Worker | `mathhub-porras` |
 | Cloudflare configuration | `wrangler.cloudflare.json` |
 | Classroom identifier | `mr-porras-mathhub-classroom` |
 | Student route | `/` |
 | Professor route | `/teacher` |
 
-For Cloudflare deployment, connect this repository's `main` branch to the Worker named `mathhub` and use `wrangler.cloudflare.json`. Publication remains pending until account authentication and the professor secret are configured.
+Production: https://mathhub-porras.hectorporras0916.workers.dev/ (professor route `/teacher`). Cloudflare builds and deploys this repository's `main` branch to `mathhub-porras` using `wrangler.cloudflare.json`.
 
 - Build command: `npm run build:cloudflare`
 - Deploy command: `npx wrangler deploy --config wrangler.cloudflare.json`
@@ -39,16 +39,25 @@ For Cloudflare deployment, connect this repository's `main` branch to the Worker
 
 Cloudflare provisions SQLite Durable Object storage from the configuration. Before classroom use, set the secret `TEACHER_CODE_SHA256` to the SHA-256 of the professor phrase uppercased with spaces and hyphens removed. The normalized phrase must contain 12–64 alphanumeric characters, with total input length at most 64. Use a unique random phrase. Without configuration the dashboard fails closed. `/api/health` reports whether the secret is configured, without disclosing it.
 
+## Voluntary support
+
+`/?view=support` provides an optional PayPal contribution page. The owner-supplied hosted payment link initially offers one-time support at $25 USD. No student information is attached to outbound links. Payment happens on PayPal; the portal does not collect card/bank data or treat a click as a completed payment.
+
+The professor can update or hide payment links in **Support MathHub · PayPal settings**. Monthly giving stays hidden until a separate PayPal Donate/subscription link is configured. One-time hosted links and PayPal.Me links cannot be placed in the monthly field. URL validation permits only supported HTTPS PayPal payment paths, excluding arbitrary hosts and redirects.
+
+Schema version 2 adds nullable school/contact columns and a support-settings table without replacing the existing classroom or student IDs. It seeds the owner-approved PayPal link once; subsequent restarts preserve professor changes. Older cached clients may still create a name-only profile, which the professor can complete later.
+
 ## Verification
 
-- `node node_modules/typescript/bin/tsc --noEmit --incremental false`
+- `npm run typecheck:cloudflare`
+- `node scripts/verify-registration-migration.mjs`
 - `node scripts/verify-cloudflare.mjs`
 - `node scripts/verify-cloudflare.mjs --sites`
 - `npm run build:cloudflare`
 - `npx wrangler deploy --config wrangler.cloudflare.json --dry-run --outdir work/worker`
 - `node scripts/verify-worker.mjs`
 
-Math checks independently calculate 12,960 questions across all 72 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. Browser visual and interaction QA was unavailable in this development environment.
+Math checks independently calculate 12,960 questions across all 72 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. The registration migration test also exercises existing records, repeat startup, and unchanged profile/progress/session IDs.
 
 ## Content references
 

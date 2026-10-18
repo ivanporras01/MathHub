@@ -5,7 +5,7 @@ import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
 const native=process.argv.includes('--sites');
 const out=new URL(native?'../work/sites-verification/':'../work/cloudflare-verification/',import.meta.url);await mkdir(out,{recursive:true});
-for(const name of ['curriculum','question-engine','extra-topics','high-school-topics','extra-questions','high-school-questions','expressions-model','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
+for(const name of ['registration','support-config','curriculum','question-engine','extra-topics','high-school-topics','extra-questions','high-school-questions','expressions-model','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
 await writeFile(new URL('test-env.mjs',out),"export const env={DB:null,TEACHER_EMAIL:'teacher@example.test'};");
 const {TOPICS,isCorrect,parseAnswer}=await import(new URL('curriculum.mjs',out));
 const {generateQuestion}=await import(new URL('question-engine.mjs',out));
@@ -147,4 +147,56 @@ const remembered=await handlePost(new Request('https://math.test/api/teacher-log
 assert.equal(remembered.status,200);assert.ok(remembered.headers.get('Set-Cookie').includes('Max-Age=2592000'));
 assert.equal((await call('auth-options')).data.accountLogin,native);
 console.log('PASS: private teacher code, secure cookies, session rotation/revocation/expiry, code changes, student isolation, CSRF rejection, teacher actions, and persistent rate limiting.');
+
+// Expanded registration keeps school/contact data behind teacher authentication.
+const schoolProfile={schoolGrade:'7',schoolName:'Example Academy',email:'family@example.test',emailType:'guardian'};
+const newLearner={firstName:'Profile',lastName:'Fixture',grade:9,mode:'new',...schoolProfile};
+assert.equal((await call('join',{...newLearner,schoolGrade:''})).status,400);
+assert.equal((await call('join',{...newLearner,schoolGrade:'99'})).status,400);
+assert.equal((await call('join',{...newLearner,schoolName:'x'.repeat(121)})).status,400);
+assert.equal((await call('join',{...newLearner,email:'not an email'})).status,400);
+assert.equal((await call('join',{...newLearner,emailType:'friend'})).status,400);
+assert.equal((await call('join',{firstName:'Missing',lastName:'Profile',mode:'returning'})).status,404);
+const privateLearner=await call('join',newLearner);
+assert.equal(privateLearner.status,200);
+const privateId=privateLearner.data.student.id;
+for(const field of Object.keys(schoolProfile))assert.equal(privateLearner.data.student[field],undefined);
+assert.equal((await call('join',newLearner)).status,409,'new registration cannot overwrite an existing name');
+await call('lesson',{topicId:TOPICS.find(t=>t.grade===9).id,stage:'learn'},privateLearner.cookie);
+const beforeProfileProgress=(await call('session',undefined,privateLearner.cookie)).data.progress;
+const resumed=await call('join',{...newLearner,mode:'returning',schoolName:'Attacker overwrite',email:'wrong@example.test'});
+assert.equal(resumed.data.student.id,privateId);
+assert.deepEqual(resumed.data.progress,beforeProfileProgress);
+assert.equal(resumed.data.student.schoolName,undefined);
+let privateRoster=(await call('teacher',undefined,independentLogin.cookie)).data.students.find(s=>s.id===privateId);
+for(const [key,value] of Object.entries(schoolProfile))assert.equal(privateRoster[key],value);
+assert.equal(privateRoster.grade,9,'course is distinct from school grade');
+assert.equal((await call('student-profile',{studentId:privateId,...schoolProfile},resumed.cookie)).status,401);
+assert.equal((await call('student-profile',{studentId:privateId,...schoolProfile},independentLogin.cookie,{Origin:'https://evil.test'})).status,403);
+assert.equal((await call('student-profile',{studentId:privateId,...schoolProfile,email:'bad'},independentLogin.cookie)).status,400);
+assert.equal((await call('student-profile',{studentId:privateId,...schoolProfile,schoolGrade:'8',email:''},independentLogin.cookie)).status,200);
+privateRoster=(await call('teacher',undefined,independentLogin.cookie)).data.students.find(s=>s.id===privateId);
+assert.equal(privateRoster.schoolGrade,'8');assert.equal(privateRoster.email,'');assert.equal(privateRoster.emailType,'');
+assert.equal(privateRoster.grade,9);
+assert.deepEqual((await call('session',undefined,resumed.cookie)).data.progress,beforeProfileProgress);
+assert.equal((await call('session',undefined,resumed.cookie)).data.student.schoolGrade,undefined);
+assert.equal((await call('join',{...newLearner,lastName:'Noemail',email:'',emailType:''})).status,200,'email is optional');
+const initialSupport={enabled:true,paypalUrl:'https://www.paypal.com/ncp/payment/VDP5WQJ3E5W9G',monthlyUrl:''};
+assert.deepEqual((await call('support')).data,initialSupport);
+assert.equal((await call('teacher-support',undefined,resumed.cookie)).status,401);
+assert.equal((await call('support-settings',initialSupport,resumed.cookie)).status,401);
+assert.equal((await call('support-settings',initialSupport,independentLogin.cookie,{Origin:'https://evil.test'})).status,403);
+for(const paypalUrl of ['javascript:alert(1)','https://www.paypal.com.evil.test/ncp/payment/ABC12345','https://www.paypal.com/signin','https://user@www.paypal.com/ncp/payment/ABC12345','https://www.paypal.com/ncp/payment/ABC12345?redirect_uri=https://evil.test','https://www.paypal.com/webapps/billing/plans/subscribe?plan_id=P-ABC123']){
+ assert.equal((await call('support-settings',{...initialSupport,paypalUrl},independentLogin.cookie)).status,400,paypalUrl);
+}
+assert.equal((await call('support-settings',{...initialSupport,monthlyUrl:initialSupport.paypalUrl},independentLogin.cookie)).status,400,'one-time payment link cannot be advertised as monthly');
+assert.equal((await call('support-settings',{enabled:true,paypalUrl:'',monthlyUrl:''},independentLogin.cookie)).status,400);
+assert.equal((await call('support-settings',{...initialSupport,enabled:false},independentLogin.cookie)).status,200);
+assert.deepEqual((await call('support')).data,{enabled:false,paypalUrl:'',monthlyUrl:''});
+assert.equal((await call('teacher-support',undefined,independentLogin.cookie)).data.paypalUrl,initialSupport.paypalUrl);
+assert.equal((await call('support-settings',{...initialSupport,monthlyUrl:'https://www.paypal.com/donate/?hosted_button_id=TESTBUTTON123'},independentLogin.cookie)).status,200);
+assert.match((await call('support')).data.monthlyUrl,/TESTBUTTON123/);
+await call('support-settings',initialSupport,independentLogin.cookie);
+assert.deepEqual((await call('support')).data,initialSupport);
+console.log('PASS: expanded profiles, optional email, teacher-only contact data and edits, unchanged learning progress, PayPal configuration, URL validation, and monthly/one-time separation.');
 sqlite.close();

@@ -45,11 +45,27 @@ try {
   assert.equal(roster.status,200);
   assert.equal(roster.data.students.length,1);
   assert.equal(roster.data.students[0].currentTopic,'7-equations');
+  const privateInfo={studentId:student.data.student.id,schoolGrade:'8',schoolName:'Test School',email:'guardian@example.test',emailType:'guardian'};
+  assert.equal((await call('student-profile',privateInfo,teacher.cookie)).status,200);
+  assert.equal((await call('teacher',undefined,teacher.cookie)).data.students[0].schoolGrade,'8');
+  assert.equal((await call('teacher',undefined,teacher.cookie)).data.students[0].email,'guardian@example.test');
+  const sessionAfterEdit=await call('session',undefined,restored.cookie);
+  assert.equal(sessionAfterEdit.data.student.email,undefined);
+  assert.equal(sessionAfterEdit.data.student.grade,7);
+  assert.equal(sessionAfterEdit.data.progress['7-equations'].correct,1);
+  assert.equal((await call('join',{firstName:'Test',lastName:'Student',mode:'new',schoolGrade:'6',schoolName:'Wrong'})).status,409);
+  const support=await call('support');
+  assert.equal(support.data.paypalUrl,'https://www.paypal.com/ncp/payment/VDP5WQJ3E5W9G');
+  assert.equal(support.data.enabled,true);
+  assert.equal((await call('support-settings',{...support.data,enabled:false},restored.cookie)).status,401);
+  assert.equal((await call('support-settings',{...support.data,enabled:false},teacher.cookie)).status,200);
+  assert.equal((await call('support')).data.enabled,false);
+  assert.equal((await call('teacher-support',undefined,teacher.cookie)).data.paypalUrl,support.data.paypalUrl);
   assert.equal((await call('remove-student',{studentId:student.data.student.id},restored.cookie)).status,401);
   assert.equal((await call('remove-student',{studentId:student.data.student.id},teacher.cookie)).status,200);
   assert.equal((await call('teacher',undefined,teacher.cookie)).data.students.length,0);
   assert.equal((await call('session',undefined,restored.cookie)).data.student,null);
   await call('teacher-logout',{},teacher.cookie);
   assert.equal((await call('teacher',undefined,teacher.cookie)).status,401);
-  console.log('PASS: deployed Worker bundle with real Cloudflare SQLite Durable Object: registration, returning student, scoring, saved progress, protected dashboard, activity, removal, and logout.');
+  console.log('PASS: deployed Worker bundle with real Cloudflare SQLite Durable Object: registration, returning student, scoring, saved progress, protected dashboard, activity, private school profiles, PayPal settings, removal, and logout.');
 } finally {await mf.dispose();}
