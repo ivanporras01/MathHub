@@ -4,13 +4,20 @@ import ts from 'typescript';
 import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 const out=new URL('../work/transformations-verification/',import.meta.url);await mkdir(out,{recursive:true});
-for(const name of ['transformation-model','transformations-lab','lab-diagrams','curriculum','extra-topics','high-school-topics']){
+for(const name of ['transformation-model','figure-coordinates','transformations-lab','lab-diagrams','curriculum','extra-topics','high-school-topics']){
  const jsx=['transformations-lab','lab-diagrams'].includes(name);
  let source=await readFile(new URL(`../app/${name}.${jsx?'tsx':'ts'}`,import.meta.url),'utf8');
  source=source.replace(/^import ['"].*\.css['"];$/gm,'').replace(/(['"])(\.\/[a-z-]+)\1/g,(_,q,n)=>`${q}${n}.mjs${q}`);
  await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText);
 }
 const {FIGURES,TRANSFORMS,transformPoint,graphExtent,rotationTrace,transformationRule,placeVertexLabels}=await import(new URL('transformation-model.mjs',out));
+const {coordinateDraft,readFigureCoordinates}=await import(new URL('figure-coordinates.mjs',out));
+const fractional=readFigureCoordinates([['-3/2','−1'],['2.5','-1'],['1/2','3 1/2']]);
+assert.equal(fractional.ok,true);assert.deepEqual(fractional.points,[[-1.5,-1],[2.5,-1],[.5,3.5]]);
+for(const points of [...FIGURES.map(f=>f.points),[[-50,-50],[50,-50],[50,50],[-50,50]],[[0,0],[4,0],[4,4],[2,1],[0,4]]])assert.deepEqual(readFigureCoordinates(coordinateDraft(points)),{ok:true,points});
+for(const draft of [[['','1']],[['abc','0']],[['1/0','0']],[['Infinity','0']],[['1,5','0']],[['50.1','0']],[['0','-51']]]){const result=readFigureCoordinates(draft);assert.equal(result.ok,false);assert.ok(Object.keys(result.errors).length);}
+for(const points of [[[0,0],[1,1]],[[0,0],[0,0],[1,1]],[[0,0],[1,1],[2,2]],[[0,0],[3,3],[0,3],[3,0]],[[0,0],[4,0],[4,4],[2,0],[0,4]],Array.from({length:9},(_,i)=>[Math.cos(i),Math.sin(i)])])assert.equal(readFigureCoordinates(coordinateDraft(points)).ok,false);
+assert.equal(readFigureCoordinates([['-1/2','3/4']]).ok,true);
 const near=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} differs from ${b}`);
 const signedArea=p=>p.reduce((sum,[x,y],i)=>{const q=p[(i+1)%p.length];return sum+x*q[1]-q[0]*y;},0)/2;
 const distance=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);
@@ -43,6 +50,8 @@ for(const figure of [...FIGURES,{id:'custom',points:[[-2,-3],[2,-2],[4,1],[1,4],
 }
 const {default:Lab}=await import(new URL('transformations-lab.mjs',out));const html=renderToStaticMarkup(React.createElement(Lab));
 for(const phrase of ['Triangle','Rectangle','Square','Pentagon','Hexagon','Custom polygon','Start step by step','Original (x, y)','Image (x′, y′)','Check prediction'])assert.ok(html.includes(phrase),phrase);
+for(const phrase of ['Enter your figure','Draw my figure','Apply transformation','Compare coordinates before and after','Vertex A x','Vertex C y','Add vertex','Remove last vertex'])assert.ok(html.includes(phrase),phrase);
+assert.ok(html.indexOf('Vertex A x')<html.indexOf('class="tf-graph"'),'coordinate editor is visible before the graph');
 assert.ok(html.includes('A → A′')&&html.includes('C → C′'));
 const svg=html.match(/<svg class="tf-graph"[\s\S]*?<\/svg>/)[0];
 for(const coordinateLabel of ['A (1, 1)','B (4, 1)','C (2, 4)','A′ (-1, 1)','B′ (-1, 4)','C′ (-4, 2)'])assert.ok(svg.includes(coordinateLabel),coordinateLabel);
@@ -50,4 +59,14 @@ assert.ok(html.includes('Clockwise (CW)')&&html.includes('Counterclockwise (CCW)
 for(const id of ['original-outline','image-outline'])assert.ok(new RegExp('data-testid="'+id+'"').test(svg));
 for(const box of placeVertexLabels([{text:'A (1, 1)',x:300,y:250,image:false},{text:'A′ (1, 1)',x:300,y:250,image:true}]))assert.ok(box.x>=0&&box.y>=0&&box.x+box.width<=560&&box.y+box.height<=560);
 await writeFile(new URL('rotation.svg',out),svg);
-console.log(`PASS: ${checked} figure/transform/scale/position combinations preserve distances, area and orientation as expected; all coordinates fit the graph; default triangle and controls render.`);
+for(const {id:mode} of TRANSFORMS){
+ const custom=renderToStaticMarkup(React.createElement(Lab,{initialPoints:fractional.points,initialMode:mode}));
+ const expected=fractional.points.map(p=>transformPoint(p,mode,{dx:2,dy:1,scale:2}));
+ expected.forEach((p,i)=>assert.ok(custom.includes(`${String.fromCharCode(65+i)}′ (${p.join(', ')})`),`${mode}: ${p}`));
+ assert.ok(!/NaN|Infinity/.test(custom));
+}
+const before=renderToStaticMarkup(React.createElement(Lab,{initialPoints:fractional.points,initialApplied:false}));
+assert.ok(before.includes('Apply to reveal'));assert.ok(before.includes('data-testid="original-outline"'));assert.ok(!before.includes('data-testid="image-outline"'));assert.ok(!before.includes('class="tf-image-dot"'));assert.ok(!before.includes('class="tf-focus"'));
+const point=renderToStaticMarkup(React.createElement(Lab,{initialPoints:[[1.5,-2]]}));assert.ok(point.includes('Vertex P x'));assert.ok(!point.includes('Add vertex'));assert.ok(point.includes('P′ (2, 1.5)'));
+await writeFile(new URL('custom.svg',out),renderToStaticMarkup(React.createElement(Lab,{initialPoints:fractional.points})).match(/<svg class="tf-graph"[\s\S]*?<\/svg>/)[0]);
+console.log(`PASS: ${checked} figure/transform/scale/position combinations preserve distances, area and orientation as expected; coordinate entry accepts fractions and validates bounds, duplicates, crossings, and area; custom figures render all transformations; results stay hidden until applied.`);

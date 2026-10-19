@@ -42,15 +42,15 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
     "title": "Linear inequalities",
     "category": "Algebra 1",
     "color": "peach",
-    "minutes": 10,
-    "description": "Describe all values that make a comparison true.",
-    "idea": "An inequality usually has a set of solutions rather than one answer. Multiplying or dividing both sides by a negative reverses their order.",
+    "minutes": 20,
+    "description": "Explore half-planes, boundaries, and systems.",
+    "idea": "A linear inequality in two variables describes a half-plane. A system keeps the ordered pairs that satisfy every inequality: the overlapping feasible region.",
     "rules": [
-      "Isolate the variable using operations on both sides.",
-      "Reverse the comparison when multiplying or dividing by a negative.",
-      "Check a value in the proposed solution set."
+      "Isolate y when possible; reverse the sign when dividing by a negative.",
+      "Use a dashed boundary for < or > and a solid boundary for ≤ or ≥.",
+      "Test an ordered pair, shade the correct side, then keep the overlap for a system."
     ],
-    "mistake": "Dividing by a negative without reversing the inequality gives the wrong side of the number line.",
+    "mistake": "Above or below applies after y is isolated. A system requires every condition, including strict boundaries, to hold.",
     "visual": "numberline",
     "standard": "Introductory practice"
   },

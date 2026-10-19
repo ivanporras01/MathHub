@@ -6,7 +6,7 @@ import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
 const native=process.argv.includes('--sites');
 const out=new URL(native?'../work/sites-verification/':'../work/cloudflare-verification/',import.meta.url);await mkdir(out,{recursive:true});
-for(const name of ['coursework','coursework-server','registration','support-config','curriculum','question-engine','extra-topics','high-school-topics','extra-questions','high-school-questions','expressions-model','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
+for(const name of ['coursework','coursework-server','registration','support-config','curriculum','question-engine','inequalities-model','inequality-questions','extra-topics','high-school-topics','extra-questions','high-school-questions','expressions-model','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
 await writeFile(new URL('test-env.mjs',out),"export const env={DB:null,TEACHER_EMAIL:'teacher@example.test'};");
 const {TOPICS,isCorrect,parseAnswer}=await import(new URL('curriculum.mjs',out));
 const {generateQuestion}=await import(new URL('question-engine.mjs',out));
@@ -79,6 +79,14 @@ assert.equal(resumedExpression.data.question.expression,oldExpression.question.e
 assert.equal((await call('answer',{questionId:'legacy-expression',answer:String(oldExpression.question.answer)},ck)).data.correct,true);
 const upgradedExpression=await next('9-expressions');assert.ok(upgradedExpression.row.seed<0);
 assert.equal((await call('answer',{questionId:upgradedExpression.id,answer:String(upgradedExpression.q.answer)},ck)).data.correct,true);
+// Preserve an inequality already issued before the graphing expansion.
+const legacyInequality=JSON.parse(await readFile(new URL('./fixtures/legacy-inequalities.json',import.meta.url),'utf8'))[4];
+sqlite.prepare('INSERT INTO questions(id,student_id,topic_id,seed,level,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').run('legacy-inequality',studentId,'9-inequalities',legacyInequality.seed,legacyInequality.level,Date.now(),Date.now());
+const resumedInequality=await call('question',{topicId:'9-inequalities'},ck);
+assert.equal(resumedInequality.data.question.expression,legacyInequality.question.expression);
+assert.equal((await call('answer',{questionId:'legacy-inequality',answer:String(legacyInequality.question.answer)},ck)).data.correct,true);
+const upgradedInequality=await next('9-inequalities');assert.ok(upgradedInequality.row.seed<0);
+assert.equal((await call('answer',{questionId:upgradedInequality.id,answer:String(upgradedInequality.q.answer)},ck)).data.correct,true);
 let restored=await call('join',{firstName:' ZOË ',lastName:"o'neil",grade:8});assert.equal(restored.data.student.id,studentId);assert.equal(Object.keys(restored.data.progress).length,72);assert.ok(restored.data.progress['6-order'].learned&&restored.data.progress['6-order'].guided);
 await call('activity',{topicId:'7-equations',stage:'guided',grade:7},ck);await call('help',{requested:true,topicId:'7-equations'},ck);await call('activity',{topicId:'8-functions',stage:'learn',grade:8},ck);
 const dashboard=await call('teacher',undefined,'',teacher);assert.equal(dashboard.status,200);const learner=dashboard.data.students.find(s=>s.id===studentId);assert.equal(learner.helpTopic,'7-equations');assert.equal(learner.currentTopic,'8-functions');assert.equal(learner.helpRequested,true);assert.equal(Object.keys(learner.progress).length,72);

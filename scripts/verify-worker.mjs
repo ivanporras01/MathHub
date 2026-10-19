@@ -1,4 +1,5 @@
 import {verifyCoursework} from './verify-coursework.mjs';
+import {inequalityOracle} from './inequalities-oracle.mjs';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {realpathSync} from 'node:fs';
@@ -33,6 +34,10 @@ try {
   const n=q.data.question.expression.replaceAll('−','-').match(/-?\d+(?:\.\d+)?/g).map(Number);
   const result=await call('answer',{questionId:q.data.question.id,answer:String((n[2]-n[1])/n[0])},student.cookie);
   assert.equal(result.data.correct,true);
+  const inequality=await call('question',{topicId:'9-inequalities'},student.cookie);
+  assert.equal(inequality.status,200);
+  const inequalityResult=await call('answer',{questionId:inequality.data.question.id,answer:String(inequalityOracle(inequality.data.question))},student.cookie);
+  assert.equal(inequalityResult.data.correct,true);
   await call('logout',{},student.cookie);
   assert.equal((await call('session',undefined,student.cookie)).data.student,null);
   const restored=await call('join',{firstName:'TEST',lastName:'student',grade:6});

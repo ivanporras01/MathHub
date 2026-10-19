@@ -5,7 +5,7 @@ import React from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {evaluateText,coefficientFromText,expressionOracle} from './expression-oracle.mjs';
 const out=new URL('../work/expressions-verification/',import.meta.url);await mkdir(out,{recursive:true});
-for(const name of ['expressions-model','expressions-lab','lab-diagrams','curriculum','extra-topics','high-school-topics','question-utils','question-engine','extra-questions','high-school-questions']){
+for(const name of ['expressions-model','expressions-lab','lab-diagrams','curriculum','extra-topics','high-school-topics','question-utils','question-engine','inequalities-model','inequality-questions','extra-questions','high-school-questions']){
  const jsx=['expressions-lab','lab-diagrams'].includes(name);
  let source=await readFile(new URL(`../app/${name}.${jsx?'tsx':'ts'}`,import.meta.url),'utf8');
  source=source.replace(/^import ['"].*\.css['"];$/gm,'').replace(/(['"])(\.\/[a-z-]+)\1/g,(_,q,n)=>`${q}${n}.mjs${q}`);

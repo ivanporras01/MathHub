@@ -7,6 +7,7 @@ import TransformationsLab from './transformations-lab';
 import SystemsLab from './systems-lab';
 import ExpressionsLab from './expressions-lab';
 import ParallelLinesLab from './parallel-lines-lab';
+import InequalitiesLab from './inequalities-lab';
 import {CheckCircle2,Lightbulb,RotateCcw,ChevronRight} from 'lucide-react';
 import {generateQuestion} from './question-engine';
 import {TOPICS,type Topic} from './curriculum';
@@ -16,6 +17,7 @@ const round=(n:number)=>Number(n.toFixed(2));
 export default function InteractiveLesson({topic}:{topic:Topic}){
  const [a,setA]=useState(3),[b,setB]=useState(2),[c,setC]=useState(4),[chosen,setChosen]=useState<number|null>(null),[revealed,setRevealed]=useState(false),[step,setStep]=useState(0);
  if(topic.id==='11-parallel')return <ParallelLinesLab/>;
+ if(topic.id==='9-inequalities')return <InequalitiesLab/>;
  if(topic.id==='8-transformations'||topic.id==='11-transformations')return <TransformationsLab/>;
  if(topic.id==='8-systems'||topic.id==='9-systems')return <SystemsLab/>;
  if(['7-expressions','8-distribute','9-expressions'].includes(topic.id))return <ExpressionsLab advanced={topic.id==='9-expressions'}/>;

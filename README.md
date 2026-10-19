@@ -8,6 +8,20 @@ New students provide first and last names, their school grade, and school name; 
 
 Mastery requires the Learn and Guided stages plus five independent first-try correct answers. Supported answers still count as correct practice. Activity indicates a recent visible-page heartbeat, not verified attention.
 
+## Linear inequalities lab
+
+Algebra 1 → **Linear inequalities** now covers one-variable comparisons, two-variable half-planes, and systems of two or three constraints. The coordinate lab lets students change the comparison, slope, intercept, and vertical boundaries; build the graph in stages; isolate the overlap; and move a test point with the graph or keyboard controls. Each point is substituted into every inequality with explicit true/false feedback.
+
+Examples include strict/inclusive boundaries, a bounded triangle, an unbounded strip, disjoint regions, and coincident boundaries. A general half-plane solver distinguishes an area, solutions on a boundary, a single point, and an empty set. Teaching explains sign reversal, why above/below requires isolating y, and why a system means AND. Exploration challenges provide explanations; guided and scored practice now also include boundary coordinates, point membership, systems, and integer solutions at a fixed x.
+
+New questions use a versioned negative seed; old unsigned inequality questions retain their exact wording and scoring. Existing topic IDs, progress, class assignments, and teacher access remain intact.
+
+## Custom figures and transformations
+
+The shared Transformations lab in Pre-Algebra and Geometry now starts with a visible coordinate editor. Students can enter one point or a polygon with 3–8 vertices, including signed integers, decimals, and fractions from −50 to 50. **Draw my figure** validates the complete draft before changing the graph. Missing/invalid coordinates, repeated vertices, crossing edges, and polygons with no area receive specific feedback; invalid edits keep the previous figure intact.
+
+Students then choose a reflection, rotation (90°, 180°, or 270° in either direction), translation, or dilation and select **Apply transformation**. Changing the transformation hides the previous image until it is applied again. Original and image vertices appear together on equal-scale axes with a before/after coordinate table, rotation traces, and step-by-step correspondence. Rotations and dilations use the origin. Custom coordinate inputs replace the old whole-figure position sliders, so the original figure matches the entered coordinates exactly. Exploration does not alter scored practice progress.
+
 ## Professor access
 
 Open `/teacher`. Use the private professor access phrase. Capitalization, spaces, and hyphens are ignored. Sessions last eight hours, or 30 days when the personal-device checkbox is selected. Secure HttpOnly cookies, hashed server sessions, expiry, sign-out, rotation, and persistent login limits protect the dashboard. Never commit real credentials or their hashes.
@@ -66,6 +80,8 @@ Schema version 2 adds nullable school/contact columns and a support-settings tab
 - `node scripts/verify-cloudflare.mjs`
 - `node scripts/verify-cloudflare.mjs --sites`
 - `node scripts/verify-learning.mjs`
+- `node scripts/verify-inequalities.mjs`
+- `node scripts/verify-transformations.mjs`
 - `npm run build:cloudflare`
 - `npx wrangler deploy --config wrangler.cloudflare.json --dry-run --outdir work/worker`
 - `node scripts/verify-worker.mjs`

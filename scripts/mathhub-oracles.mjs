@@ -14,7 +14,7 @@ case '8-distribute':return e[0]+e[2];
 case '8-percent':return p[1]*100/p[0];
 case '9-expressions':return expressionOracle(q);
 case '9-equations':return (e[3]-e[2])/e[0]-e[1];
-case '9-inequalities':return (e[2]-e[1])/e[0];
+case '9-inequalities':return inequalityOracle(q);
 case '9-functions':return p[0]*p[2]**2+p[1];
 case '9-slope':return (p[3]-p[1])/(p[2]-p[0]);
 case '9-lines':return p[0]*p[2]+p[1];
@@ -51,3 +51,4 @@ case '11-measurement':return p[0]**2*p[1]/(q.prompt.includes('cone')?3:1);
 default:throw Error('Missing independent oracle: '+id);
 }}
 import {expressionOracle} from './expression-oracle.mjs';
+import {inequalityOracle} from './inequalities-oracle.mjs';

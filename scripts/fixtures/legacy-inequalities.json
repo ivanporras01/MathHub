@@ -1,0 +1,410 @@
+[
+  {
+    "seed": 0,
+    "level": 1,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 3,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-2x > -6",
+          "ask": "What is the new right-hand value?",
+          "answer": -6
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 3",
+          "ask": "What is the boundary k?",
+          "answer": 3
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 2: 1 > -1",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 2
+        }
+      ],
+      "expression": "-2x + 5 > -1",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 0,
+    "level": 2,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 3,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-3x > -9",
+          "ask": "What is the new right-hand value?",
+          "answer": -9
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 3",
+          "ask": "What is the boundary k?",
+          "answer": 3
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 2: -1 > -4",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 2
+        }
+      ],
+      "expression": "-3x + 5 > -4",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 0,
+    "level": 3,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 3,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-3x > -9",
+          "ask": "What is the new right-hand value?",
+          "answer": -9
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 3",
+          "ask": "What is the boundary k?",
+          "answer": 3
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 2: -1 > -4",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 2
+        }
+      ],
+      "expression": "-3x + 5 > -4",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 42,
+    "level": 1,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": -2,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-3x > 6",
+          "ask": "What is the new right-hand value?",
+          "answer": 6
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < -2",
+          "ask": "What is the boundary k?",
+          "answer": -2
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = -3: 12 > 9",
+          "ask": "What value one below the boundary did we check?",
+          "answer": -3
+        }
+      ],
+      "expression": "-3x + 3 > 9",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 42,
+    "level": 2,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": -2,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-4x > 8",
+          "ask": "What is the new right-hand value?",
+          "answer": 8
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < -2",
+          "ask": "What is the boundary k?",
+          "answer": -2
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = -3: 15 > 11",
+          "ask": "What value one below the boundary did we check?",
+          "answer": -3
+        }
+      ],
+      "expression": "-4x + 3 > 11",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 42,
+    "level": 3,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": -2,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-4x > 8",
+          "ask": "What is the new right-hand value?",
+          "answer": 8
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < -2",
+          "ask": "What is the boundary k?",
+          "answer": -2
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = -3: 15 > 11",
+          "ask": "What value one below the boundary did we check?",
+          "answer": -3
+        }
+      ],
+      "expression": "-4x + 3 > 11",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 81293,
+    "level": 1,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 7,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-4x > -28",
+          "ask": "What is the new right-hand value?",
+          "answer": -28
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 7",
+          "ask": "What is the boundary k?",
+          "answer": 7
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 6: -19 > -23",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 6
+        }
+      ],
+      "expression": "-4x + 5 > -23",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 81293,
+    "level": 2,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 7,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-7x > -49",
+          "ask": "What is the new right-hand value?",
+          "answer": -49
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 7",
+          "ask": "What is the boundary k?",
+          "answer": 7
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 6: -37 > -44",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 6
+        }
+      ],
+      "expression": "-7x + 5 > -44",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 81293,
+    "level": 3,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 7,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-7x > -49",
+          "ask": "What is the new right-hand value?",
+          "answer": -49
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 7",
+          "ask": "What is the boundary k?",
+          "answer": 7
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 6: -37 > -44",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 6
+        }
+      ],
+      "expression": "-7x + 5 > -44",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 4294967295,
+    "level": 1,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 3,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-2x > -6",
+          "ask": "What is the new right-hand value?",
+          "answer": -6
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 3",
+          "ask": "What is the boundary k?",
+          "answer": 3
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 2: -3 > -5",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 2
+        }
+      ],
+      "expression": "-2x + 1 > -5",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 4294967295,
+    "level": 2,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 3,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-3x > -9",
+          "ask": "What is the new right-hand value?",
+          "answer": -9
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 3",
+          "ask": "What is the boundary k?",
+          "answer": 3
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 2: -5 > -8",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 2
+        }
+      ],
+      "expression": "-3x + 1 > -8",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  },
+  {
+    "seed": 4294967295,
+    "level": 3,
+    "question": {
+      "prompt": "The solution is x < k. What is k?",
+      "answer": 3,
+      "hint": "Subtract the constant, then divide by the negative coefficient and reverse the inequality.",
+      "steps": [
+        {
+          "title": "Undo addition",
+          "text": "Subtract the constant on both sides.",
+          "math": "-3x > -9",
+          "ask": "What is the new right-hand value?",
+          "answer": -9
+        },
+        {
+          "title": "Divide and reverse",
+          "text": "Dividing by a negative reverses > to <.",
+          "math": "x < 3",
+          "ask": "What is the boundary k?",
+          "answer": 3
+        },
+        {
+          "title": "Check the direction",
+          "text": "A value below the boundary satisfies the inequality.",
+          "math": "x = 2: -5 > -8",
+          "ask": "What value one below the boundary did we check?",
+          "answer": 2
+        }
+      ],
+      "expression": "-3x + 1 > -8",
+      "note": "Enter only the boundary k; the full solution is an inequality."
+    }
+  }
+]
