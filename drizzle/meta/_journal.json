@@ -29,6 +29,13 @@
       "when": 1792345084437,
       "tag": "0003_student_profiles_and_support",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1792363451126,
+      "tag": "0004_classes_and_assignments",
+      "breakpoints": true
     }
   ]
 }

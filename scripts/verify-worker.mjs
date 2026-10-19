@@ -1,3 +1,4 @@
+import {verifyCoursework} from './verify-coursework.mjs';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 import {realpathSync} from 'node:fs';
@@ -65,6 +66,7 @@ try {
   assert.equal((await call('remove-student',{studentId:student.data.student.id},teacher.cookie)).status,200);
   assert.equal((await call('teacher',undefined,teacher.cookie)).data.students.length,0);
   assert.equal((await call('session',undefined,restored.cookie)).data.student,null);
+  await verifyCoursework(call,teacher.cookie);
   await call('teacher-logout',{},teacher.cookie);
   assert.equal((await call('teacher',undefined,teacher.cookie)).status,401);
   console.log('PASS: deployed Worker bundle with real Cloudflare SQLite Durable Object: registration, returning student, scoring, saved progress, protected dashboard, activity, private school profiles, PayPal settings, removal, and logout.');

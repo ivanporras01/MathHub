@@ -11,6 +11,7 @@ async function compile(dir){for(const entry of await readdir(dir,{withFileTypes:
  if(entry.isDirectory()){await compile(file);continue;}
  if(!/\.tsx?$/.test(entry.name))continue;
  let source=await readFile(file,'utf8');
+ if(file.endsWith('/teacher/coursework-manager.tsx'))source+='\nexport {ClassForm,AssignmentForm,StudentResultRow};';
  source=source.replace(/^import ['"].*\.css['"];$/gm,'');
  const imports=[...source.matchAll(/(from\s*['"])(\.{1,2}\/[^'"]+)(['"])/g)];
  for(const match of imports){const target=path.resolve(dir,match[2]);let isDirectory=false;try{isDirectory=(await stat(target)).isDirectory();}catch{}
@@ -75,3 +76,27 @@ for(const id of ['6-fractions','7-rational','7-percent','8-percent','8-exponents
 }
 await writeFile(path.join(out,'parallel-lab.html'),renderToStaticMarkup(React.createElement(ParallelLab)));
 console.log(`PASS: ${rendered}/72 full lessons rendered; ${configurations} independently checked angle configurations; ${modelStates} specialist model boundary states.`);
+
+// Assignment percentages represent all topic milestones, independently of lifetime progress.
+const {taskSummary}=await load('coursework');
+const task={id:'test-task',classId:'test-class',className:'Test class',title:'Equations review',instructions:'Show your reasoning.',dueAt:2000,goal:2,topicIds:['7-equations','6-order'],archived:false,createdAt:1};
+const full={learned:true,guided:true,independent:2,correct:2,attempts:2,hints:0};
+assert.equal(taskSummary(task,{},1000).status,'Not started');
+assert.equal(taskSummary(task,{startedAt:500},1000).status,'In progress');
+assert.equal(taskSummary(task,{},3000).status,'Overdue');
+assert.equal(taskSummary(task,{progress:{'7-equations':full}},1000).percent,50);
+assert.equal(taskSummary(task,{progress:{'7-equations':full}},1000).complete,false);
+const completedWork={progress:{'7-equations':full,'6-order':full},startedAt:100,completedAt:1900,updatedAt:1900};
+assert.equal(taskSummary(task,completedWork,3000).status,'Completed');
+assert.equal(taskSummary(task,{...completedWork,completedAt:2100},3000).status,'Completed late');
+const {ClassForm,AssignmentForm,StudentResultRow}=await load('teacher/coursework-manager');
+const room={id:'test-class',name:'Test class',course:7,joinCode:'MHABCDEFGH',archived:false,studentIds:['test-student']};
+for(const [Component,props,expected] of [
+ [ClassForm,{onSave:async()=>{}},['Class name','Create class','Main course']],
+ [AssignmentForm,{room,onSave:async()=>{}},['Assignment title','Independent answers per topic','Choose topics','Publish to Test class']],
+ [AssignmentForm,{room,existing:task,onSave:async()=>{}},['Equations review','Save changes','Due date and time']],
+ [StudentResultRow,{name:'Test Learner',expanded:true,toggle:()=>{},work:{id:'test-student',enrolled:true,...completedWork},assignment:task,summary:taskSummary(task,completedWork),totals:{correct:4,attempts:4},needsHelp:true,helpTopic:'7-equations',onHelp:async()=>{},working:false},['Test Learner','100%','Mark helped','Topics in Equations review']],
+]){const html=renderToStaticMarkup(React.createElement(Component,props));for(const phrase of expected)assert.ok(html.includes(phrase),phrase);assert.ok(!/NaN|undefined/.test(html));}
+const assignedLesson=renderToStaticMarkup(React.createElement(Lesson,{topic:TOPICS.find(t=>t.id==='7-equations'),student:{id:'test-student',firstName:'Test',lastName:'Learner',grade:7},progress:{'7-equations':full},assignment:task,stage:'practice',setStage:()=>{},onProgress:()=>{},onBack:()=>{},onHelp:()=>{},onNext:()=>{}}));
+assert.ok(assignedLesson.includes('Equations review')&&assignedLesson.includes('Assignment topic complete')&&assignedLesson.includes('Goal: 2 correct first tries without hints'));
+console.log('PASS: assignment milestone/status calculations, teacher forms, per-student topic report, and assigned lesson rendering.');

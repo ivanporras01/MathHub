@@ -16,6 +16,18 @@ The dashboard provides name/school/contact search, course and activity filters, 
 
 The Cloudflare deployment uses the professor phrase and ignores caller-supplied identity headers. The original optional Sites adapter is retained in the source, but this repository has no Sites project identity or shared deployment manifest.
 
+## Classes and assignments
+
+Open `/teacher?tab=classes`, create a named class, and choose its main course. Add registered students from the roster, or share the generated class code. Students can enter the code during registration or in **My assignments** (`/?view=assignments`). Students can belong to several classes. This release keeps one professor account; it does not enable other teachers or school memberships.
+
+Create an assignment for a class with a title, optional instructions/due date, selected topics, and 1–20 independent first-try answers per topic. Students complete Learn, Guided, and the selected practice goal for each topic. Work begins at zero for each assignment, even if a topic was mastered previously. Assignment practice also contributes to lifetime progress. New class members receive the class’s existing assignments.
+
+The assignment report shows each student’s completion percentage, status, attempts/correct answers, help request, and per-topic milestones. CSV export includes assignment progress. Student lists refresh every 15 seconds; teacher reports every 12 seconds. Due dates use the browser’s time zone when entered/displayed and UTC timestamps in storage. Late work stays open and records late completion. Topics and practice goals remain fixed after publication; the title, instructions, and due date can be edited.
+
+Closing an assignment blocks new work but leaves students’ results visible. Archiving a class hides its assignments and disables its join code. Reopening restores access. Removing a student from a class preserves their results; re-enrolling restores progress. Deleting the student profile removes that student’s class membership and assignment records as well.
+
+Schema version 3 adds classes, memberships, assignments, topic milestones, work/completion timestamps, and nullable assignment context on questions/help requests. Migrations preserve existing IDs, sessions, profiles, free-practice questions, progress, and PayPal settings. Teacher endpoints use the existing protected session. Student access requires active enrollment in the class; scoring validates the question’s stored assignment context before accepting an answer, hint, or solution.
+
 ## Hosting
 
 This repository is `ivanporras01/MathHub`, with its own `main` branch and history. It is an independent project. Production secrets are configured through Cloudflare, never in source. The Worker is named `mathhub-porras`; its Durable Object namespace and records belong to that Worker. MathPath is not a dependency.
@@ -53,11 +65,12 @@ Schema version 2 adds nullable school/contact columns and a support-settings tab
 - `node scripts/verify-registration-migration.mjs`
 - `node scripts/verify-cloudflare.mjs`
 - `node scripts/verify-cloudflare.mjs --sites`
+- `node scripts/verify-learning.mjs`
 - `npm run build:cloudflare`
 - `npx wrangler deploy --config wrangler.cloudflare.json --dry-run --outdir work/worker`
 - `node scripts/verify-worker.mjs`
 
-Math checks independently calculate 12,960 questions across all 72 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. The registration migration test also exercises existing records, repeat startup, and unchanged profile/progress/session IDs.
+Math checks independently calculate 12,960 questions across all 72 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. The migration test also exercises version-1 and version-2 records, repeat startup, and unchanged profile/question/progress/session IDs. Shared coursework checks run against both adapters and the actual Worker: enrollment, separate task credit, student/teacher authorization, hints/retries, completion timestamps, help context, archive/reopen behavior, returning students, and removal.
 
 ## Content references
 

@@ -1,3 +1,4 @@
+import {verifyCoursework} from './verify-coursework.mjs';
 import assert from 'node:assert/strict';
 import {extraOracle} from './mathhub-oracles.mjs';
 import {readFile,writeFile,mkdir,readdir} from 'node:fs/promises';
@@ -5,7 +6,7 @@ import {DatabaseSync} from 'node:sqlite';
 import ts from 'typescript';
 const native=process.argv.includes('--sites');
 const out=new URL(native?'../work/sites-verification/':'../work/cloudflare-verification/',import.meta.url);await mkdir(out,{recursive:true});
-for(const name of ['registration','support-config','curriculum','question-engine','extra-topics','high-school-topics','extra-questions','high-school-questions','expressions-model','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
+for(const name of ['coursework','coursework-server','registration','support-config','curriculum','question-engine','extra-topics','high-school-topics','extra-questions','high-school-questions','expressions-model','question-utils','teacher-auth','server']){let source=await readFile(new URL(`../${!native&&['server','teacher-auth'].includes(name)?'cloudflare':'app'}/${name}.ts`,import.meta.url),'utf8');source=source.replace("'cloudflare:workers'","'./test-env.mjs'").replace(/(['"])(?:\.\.\/app\/|\.\/)([a-z-]+)\1/g,(_,quote,name)=>`${quote}./${name}.mjs${quote}`);await writeFile(new URL(`${name}.mjs`,out),ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText);}
 await writeFile(new URL('test-env.mjs',out),"export const env={DB:null,TEACHER_EMAIL:'teacher@example.test'};");
 const {TOPICS,isCorrect,parseAnswer}=await import(new URL('curriculum.mjs',out));
 const {generateQuestion}=await import(new URL('question-engine.mjs',out));
@@ -43,7 +44,7 @@ const sqlite=new DatabaseSync(':memory:');sqlite.exec('PRAGMA foreign_keys=ON');
 class Statement{constructor(sql,params=[]){this.sql=sql;this.params=params;}bind(...p){return new Statement(this.sql,p);}async first(){return sqlite.prepare(this.sql).get(...this.params)||null;}async all(){return{results:sqlite.prepare(this.sql).all(...this.params),success:true};}async run(){const r=sqlite.prepare(this.sql).run(...this.params);return{success:true,meta:{changes:r.changes}};}}
 const {env}=await import(new URL('test-env.mjs',out));env.DB={prepare:sql=>new Statement(sql),batch:async stmts=>Promise.all(stmts.map(s=>s.all()))};
 const server=await import(new URL('server.mjs',out)); const {handleGet,handlePost}=native?server:server.createHandlers(env);
-async function call(action,body,ck='',headers={}){const req=new Request(`https://math.test/api/${action}`,{method:body===undefined?'GET':'POST',headers:{...(body===undefined?{}:{'Content-Type':'application/json','Origin':'https://math.test'}),...(ck?{Cookie:ck}:{}),...headers},body:body===undefined?undefined:JSON.stringify(body)});const res=await(body===undefined?handleGet(req,action):handlePost(req,action));return{status:res.status,data:await res.json(),cookie:res.headers.get('Set-Cookie')?.split(';')[0]};}
+async function call(action,body,ck='',headers={}){const req=new Request(`https://math.test/api/${action}`,{method:body===undefined?'GET':'POST',headers:{...(body===undefined?{}:{'Content-Type':'application/json','Origin':'https://math.test'}),...(ck?{Cookie:ck}:{}),...headers},body:body===undefined?undefined:JSON.stringify(body)});const res=await(body===undefined?handleGet(req,action.split('?')[0]):handlePost(req,action.split('?')[0]));return{status:res.status,data:await res.json(),cookie:res.headers.get('Set-Cookie')?.split(';')[0]};}
 const fixtureCode='TEST-ONLY-CODE-1234';
 async function digest(value){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value))),b=>b.toString(16).padStart(2,'0')).join('');}
 const fixtureHash=await digest(fixtureCode.replaceAll('-',''));
@@ -199,4 +200,5 @@ assert.match((await call('support')).data.monthlyUrl,/TESTBUTTON123/);
 await call('support-settings',initialSupport,independentLogin.cookie);
 assert.deepEqual((await call('support')).data,initialSupport);
 console.log('PASS: expanded profiles, optional email, teacher-only contact data and edits, unchanged learning progress, PayPal configuration, URL validation, and monthly/one-time separation.');
+await verifyCoursework(call,independentLogin.cookie);
 sqlite.close();

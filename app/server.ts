@@ -1,3 +1,4 @@
+import {createCourseworkStore,CourseworkError,assignmentId} from './coursework-server';
 import {readSchoolProfile} from './registration';
 import {emptySupport,validatePayPalUrl} from './support-config';
 import { env } from 'cloudflare:workers';
@@ -7,6 +8,7 @@ import { authenticateTeacher, loginTeacher, logoutTeacher } from './teacher-auth
 const DAY=86400000;
 const cookieName='mathhub_student';
 function db(){if(!env.DB)throw new Error('Progress storage is not available. Please try again shortly.');return env.DB;}
+const coursework=createCourseworkStore(db());
 function json(data:unknown,status=200,headers:Record<string,string>={}){return Response.json(data,{status,headers:{'Cache-Control':'no-store','X-Content-Type-Options':'nosniff',...headers}});}
 function fail(message:string,status=400){return json({error:message},status);}
 function cookie(value:string,age=30*86400){return `${cookieName}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${age}`;}
@@ -17,11 +19,14 @@ async function progressFor(id:string){const results=await db().batch([
  db().prepare('SELECT topic_id, learned, guided, updated_at FROM progress WHERE student_id=?').bind(id),
  db().prepare('SELECT topic_id, SUM(attempts) attempts, SUM(correct) correct, SUM(independent) independent, SUM(hint_used) hints, MAX(updated_at) updated_at FROM questions WHERE student_id=? GROUP BY topic_id').bind(id)
 ]);const map:Record<string,any>={};for(const row of results[0].results as any[]){map[row.topic_id]={topicId:row.topic_id,learned:!!row.learned,guided:!!row.guided,attempts:0,correct:0,independent:0,hints:0,updatedAt:row.updated_at};}for(const row of results[1].results as any[]){map[row.topic_id]={learned:false,guided:false,...map[row.topic_id],topicId:row.topic_id,attempts:row.attempts||0,correct:row.correct||0,independent:row.independent||0,hints:row.hints||0,updatedAt:row.updated_at};}return map;}
-function studentView(s:any){return{id:s.id,firstName:s.first_name,lastName:s.last_name,grade:s.grade,currentTopic:s.current_topic,currentStage:s.current_stage,helpRequested:!!s.help_requested,helpTopic:s.help_topic};}
+function studentView(s:any){return{id:s.id,firstName:s.first_name,lastName:s.last_name,grade:s.grade,currentTopic:s.current_topic,currentStage:s.current_stage,helpRequested:!!s.help_requested,helpTopic:s.help_topic,helpAssignmentId:s.help_assignment_id};}
 async function supportSettings(){const row=await db().prepare('SELECT * FROM support_settings WHERE id=1').first<any>();return row?{enabled:!!row.enabled,paypalUrl:row.paypal_url,monthlyUrl:row.monthly_url}:{...emptySupport};}
 function publicQuestion(row:any){const q=generateQuestion(row.topic_id,row.seed,row.level);return{id:row.id,prompt:q.prompt,expression:q.expression,unit:q.unit,note:q.note,level:row.level,attempts:row.attempts,hint:row.hint_used?q.hint:undefined,correct:!!row.correct,revealed:!!row.revealed,steps:row.correct||row.revealed?q.steps:undefined};}
 export async function handleGet(req:Request,action:string):Promise<Response>{try{
 
+ if(action==='teacher-coursework'){if(!await authenticateTeacher(req))return teacherError(req);return json(await coursework.teacherOverview());}
+ if(action==='teacher-assignment'){if(!await authenticateTeacher(req))return teacherError(req);return json(await coursework.report(new URL(req.url).searchParams.get('id')));}
+ if(action==='assignments'){const student=await identity(req);if(!student)return fail('Enter your name to view your assignments.',401);return json(await coursework.studentOverview(student.id));}
  if(action==='support'){const settings=await supportSettings();return json(settings.enabled?settings:emptySupport);}
  if(action==='teacher-support'){if(!await authenticateTeacher(req))return teacherError(req);return json(await supportSettings());}
  if(action==='auth-options')return json({accountLogin:true});
@@ -30,25 +35,28 @@ export async function handleGet(req:Request,action:string):Promise<Response>{try
  if(action==='teacher'){
   if(!await authenticateTeacher(req))return teacherError(req);
   const [roster,totals,lessons]=await db().batch([
-   db().prepare('SELECT id,first_name,last_name,school_grade,school_name,email,email_type,grade,current_topic,current_stage,help_requested,help_topic,last_seen,joined_at FROM students ORDER BY last_seen DESC LIMIT 2000'),
+   db().prepare('SELECT s.*,a.title help_assignment_title,c.name help_class_name FROM students s LEFT JOIN assignments a ON a.id=s.help_assignment_id LEFT JOIN classrooms c ON c.id=a.class_id ORDER BY s.last_seen DESC LIMIT 2000'),
    db().prepare('SELECT student_id,topic_id,SUM(attempts) attempts,SUM(correct) correct,SUM(independent) independent,SUM(hint_used) hints,MAX(updated_at) updated_at FROM questions GROUP BY student_id,topic_id'),
    db().prepare('SELECT student_id,topic_id,learned,guided FROM progress')
   ]);
   const by:Record<string,Record<string,any>>={};
   for(const p of lessons.results as any[]){(by[p.student_id]??={})[p.topic_id]={learned:!!p.learned,guided:!!p.guided,attempts:0,correct:0,independent:0,hints:0};}
   for(const p of totals.results as any[]){const m=by[p.student_id]??={};m[p.topic_id]={...m[p.topic_id],attempts:p.attempts||0,correct:p.correct||0,independent:p.independent||0,hints:p.hints||0,updatedAt:p.updated_at};}
-  return json({students:(roster.results as any[]).map(s=>({...studentView(s),schoolGrade:s.school_grade||'',schoolName:s.school_name||'',email:s.email||'',emailType:s.email_type||'',lastSeen:s.last_seen,joinedAt:s.joined_at,progress:by[s.id]||{}})),updatedAt:Date.now()});
+  return json({students:(roster.results as any[]).map(s=>({...studentView(s),helpAssignmentTitle:s.help_assignment_title||'',helpClassName:s.help_class_name||'',schoolGrade:s.school_grade||'',schoolName:s.school_name||'',email:s.email||'',emailType:s.email_type||'',lastSeen:s.last_seen,joinedAt:s.joined_at,progress:by[s.id]||{}})),updatedAt:Date.now()});
  }
  return fail('Page not found.',404);
- }catch(e){console.error('MathHub GET failed',e);return fail('Unable to load progress right now. Please try again.',503);}}
+ }catch(e){if(e instanceof CourseworkError)return fail(e.message,e.status);console.error('MathHub GET failed',e);return fail('Unable to load progress right now. Please try again.',503);}}
 export async function handlePost(req:Request,action:string):Promise<Response>{try{
  const origin=req.headers.get('Origin');if(origin!==new URL(req.url).origin||req.headers.get('sec-fetch-site')==='cross-site')return fail('Please use the portal to submit this request.',403);
  if(!req.headers.get('content-type')?.includes('application/json'))return fail('Expected a JSON request.',415);
- const raw=await req.text();if(raw.length>4096)return fail('Request is too large.',413);
+ const raw=await req.text();if(raw.length>(action==='class-members'?16384:8192))return fail('Request is too large.',413);
  let body:any;try{body=JSON.parse(raw);}catch{return fail('Invalid request.');}if(!body||typeof body!=='object'||Array.isArray(body))return fail('Invalid request.');
  if(action==='teacher-login'||action==='teacher-logout'){
   if(origin!==new URL(req.url).origin||req.headers.get('sec-fetch-site')==='cross-site')return fail('Please use the teacher dashboard to submit this request.',403);
   return action==='teacher-login'?await loginTeacher(req,body):await logoutTeacher(req);
+ }
+ if(['class-create','class-update','class-archive','class-members','assignment-create','assignment-update','assignment-archive'].includes(action)){
+  if(!await authenticateTeacher(req))return teacherError(req);return json(await coursework.teacherAction(action,body));
  }
  if(action==='support-settings'){
   if(!await authenticateTeacher(req))return teacherError(req);
@@ -69,6 +77,7 @@ export async function handlePost(req:Request,action:string):Promise<Response>{tr
   return json({ok:true});
  }
  if(action==='join'){
+  const enrollment=await coursework.classFromCode(body.classCode);
   const clean=(v:unknown)=>typeof v==='string'?v.trim().replace(/\s+/g,' ').normalize('NFKC'):'';
   const first=clean(body.firstName),last=clean(body.lastName),valid=(n:string)=>n.length>=1&&n.length<=50&&/^[\p{L}\p{M} .’'\-]+$/u.test(n)&&/\p{L}/u.test(n);
   if(!valid(first)||!valid(last))return fail('Enter your first and last name using letters, spaces, hyphens, or apostrophes.');
@@ -85,6 +94,7 @@ export async function handlePost(req:Request,action:string):Promise<Response>{tr
    await db().prepare('INSERT INTO students (id,name_key,first_name,last_name,grade,school_grade,school_name,email,email_type,joined_at,last_seen) VALUES (?,?,?,?,?,?,?,?,?,?,?)').bind(crypto.randomUUID(),key,first,last,grade,profile.schoolGrade||null,profile.schoolName||null,profile.email||null,profile.emailType||null,now,now).run();
   }
   const student=await db().prepare('SELECT * FROM students WHERE name_key=?').bind(key).first<any>();
+  if(enrollment)await coursework.enroll(student.id,enrollment.id);
   const token=crypto.randomUUID()+crypto.randomUUID();await db().prepare('INSERT INTO sessions(token_hash,student_id,expires_at) VALUES (?,?,?)').bind(await hash(token),student.id,now+30*DAY).run();
   await db().prepare('DELETE FROM sessions WHERE expires_at<?').bind(now).run();
   return json({student:studentView(student),progress:await progressFor(student.id)},200,{'Set-Cookie':cookie(token)});
@@ -96,6 +106,9 @@ export async function handlePost(req:Request,action:string):Promise<Response>{tr
   const target=await db().prepare('SELECT id FROM students WHERE id=?').bind(body.studentId).first();
   if(!target)return fail('Student not found.',404);
   await db().batch([
+   db().prepare('DELETE FROM assignment_progress WHERE student_id=?').bind(body.studentId),
+   db().prepare('DELETE FROM assignment_work WHERE student_id=?').bind(body.studentId),
+   db().prepare('DELETE FROM class_members WHERE student_id=?').bind(body.studentId),
    db().prepare('DELETE FROM sessions WHERE student_id=?').bind(body.studentId),
    db().prepare('DELETE FROM questions WHERE student_id=?').bind(body.studentId),
    db().prepare('DELETE FROM progress WHERE student_id=?').bind(body.studentId),
@@ -104,42 +117,59 @@ export async function handlePost(req:Request,action:string):Promise<Response>{tr
  }
  if(action==='resolve-help'){
   if(!await authenticateTeacher(req))return teacherError(req);if(typeof body.studentId!=='string')return fail('Choose a student.');
-  await db().prepare('UPDATE students SET help_requested=0,help_topic=NULL WHERE id=?').bind(body.studentId).run();return json({ok:true});
+  await db().prepare('UPDATE students SET help_requested=0,help_topic=NULL,help_assignment_id=NULL WHERE id=?').bind(body.studentId).run();return json({ok:true});
  }
  const s=await identity(req);if(!s)return fail('Please enter your name to continue.',401);
  const now=Date.now();
+ if(action==='class-join'){const c=await coursework.classFromCode(body.classCode);if(!c)return fail('Enter the class code provided by Mr. Porras.');await coursework.enroll(s.id,c.id);return json({ok:true,className:c.name});}
+ if(action==='assignment-start'){
+  const a=await coursework.access(s.id,body.assignmentId,typeof body.topicId==='string'?body.topicId:undefined);if(!a)return fail('Choose an assignment.');
+  const assignmentProgress=await coursework.sync(s.id,a);return json({assignment:a,assignmentProgress});
+ }
  if(action==='activity'){
   const topic=typeof body.topicId==='string'?topicById(body.topicId):undefined,stage=['explore','learn','guided','practice','progress'].includes(body.stage)?body.stage:'explore',grade=[6,7,8,9,10,11].includes(body.grade)?body.grade:s.grade;
   await db().prepare('UPDATE students SET current_topic=?,current_stage=?,grade=?,last_seen=? WHERE id=?').bind(topic?.id||null,stage,grade,now,s.id).run();return json({ok:true});
  }
- if(action==='help'){await db().prepare('UPDATE students SET help_requested=?,help_topic=?,last_seen=? WHERE id=?').bind(body.requested===false?0:1,body.requested===false?null:(topicById(body.topicId)?.id||s.current_topic),now,s.id).run();return json({ok:true});}
+ if(action==='help'){
+  const helpTopic=topicById(body.topicId)?.id||s.current_topic;
+  const a=body.requested===false?null:await coursework.access(s.id,body.assignmentId,helpTopic||undefined);
+  await db().prepare('UPDATE students SET help_requested=?,help_topic=?,help_assignment_id=?,last_seen=? WHERE id=?').bind(body.requested===false?0:1,body.requested===false?null:helpTopic,body.requested===false?null:a?.id||null,now,s.id).run();
+  return json({ok:true});
+ }
  if(action==='lesson'){
   const topic=topicById(body.topicId);if(!topic)return fail('Choose a valid topic.');const learned=body.stage==='learn'?1:0,guided=body.stage==='guided'?1:0;if(!learned&&!guided)return fail('Choose a lesson stage.');
-  await db().prepare('INSERT INTO progress(id,student_id,topic_id,learned,guided,updated_at) VALUES (?,?,?,?,?,?) ON CONFLICT(student_id,topic_id) DO UPDATE SET learned=MAX(progress.learned,excluded.learned),guided=MAX(progress.guided,excluded.guided),updated_at=excluded.updated_at').bind(crypto.randomUUID(),s.id,topic.id,learned,guided,now).run();
-  return json({progress:await progressFor(s.id)});
+  const a=await coursework.access(s.id,body.assignmentId,topic.id);
+  const statements=[db().prepare('INSERT INTO progress(id,student_id,topic_id,learned,guided,updated_at) VALUES (?,?,?,?,?,?) ON CONFLICT(student_id,topic_id) DO UPDATE SET learned=MAX(progress.learned,excluded.learned),guided=MAX(progress.guided,excluded.guided),updated_at=excluded.updated_at').bind(crypto.randomUUID(),s.id,topic.id,learned,guided,now)];
+  if(a)statements.push(db().prepare('INSERT INTO assignment_progress(assignment_id,student_id,topic_id,learned,guided,updated_at) VALUES(?,?,?,?,?,?) ON CONFLICT(assignment_id,student_id,topic_id) DO UPDATE SET learned=MAX(assignment_progress.learned,excluded.learned),guided=MAX(assignment_progress.guided,excluded.guided),updated_at=excluded.updated_at').bind(a.id,s.id,topic.id,learned,guided,now));
+  await db().batch(statements);
+  return json({progress:await progressFor(s.id),assignmentProgress:await coursework.sync(s.id,a)});
  }
  if(action==='question'){
   const topic=topicById(body.topicId);if(!topic)return fail('Choose a valid topic.');
-  if(!body.fresh){const active=await db().prepare('SELECT * FROM questions WHERE student_id=? AND topic_id=? AND correct=0 AND revealed=0 ORDER BY created_at DESC LIMIT 1').bind(s.id,topic.id).first<any>();if(active)return json({question:publicQuestion(active)});}
+  const a=await coursework.access(s.id,body.assignmentId,topic.id),aid=a?.id||null;
+  if(a)await coursework.start(s.id,a.id);
+  if(!body.fresh){const active=await db().prepare('SELECT * FROM questions WHERE student_id=? AND topic_id=? AND assignment_id IS ? AND correct=0 AND revealed=0 ORDER BY created_at DESC LIMIT 1').bind(s.id,topic.id,aid).first<any>();if(active)return json({question:publicQuestion(active)});}
   const recent=await db().prepare('SELECT COUNT(*) count FROM questions WHERE student_id=? AND created_at>?').bind(s.id,now-60000).first<any>();if(recent.count>=40)return fail('Take a moment with your current question, then try again.',429);
-  const tally=await db().prepare('SELECT SUM(independent) count FROM questions WHERE student_id=? AND topic_id=?').bind(s.id,topic.id).first<any>();
+  const tally=await db().prepare('SELECT SUM(independent) count FROM questions WHERE student_id=? AND topic_id=? AND assignment_id IS ?').bind(s.id,topic.id,aid).first<any>();
   const level=Math.min(3,1+Math.floor((tally?.count||0)/2)),seed=seedForNewQuestion(topic.id,crypto.getRandomValues(new Uint32Array(1))[0]),id=crypto.randomUUID();
-  await db().prepare('INSERT INTO questions(id,student_id,topic_id,seed,level,created_at,updated_at) VALUES (?,?,?,?,?,?,?)').bind(id,s.id,topic.id,seed,level,now,now).run();
+  await db().prepare('INSERT INTO questions(id,student_id,topic_id,assignment_id,seed,level,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)').bind(id,s.id,topic.id,aid,seed,level,now,now).run();
   return json({question:publicQuestion({id,topic_id:topic.id,seed,level,attempts:0,hint_used:0,correct:0,revealed:0})});
  }
  if(['answer','hint','solution'].includes(action)){
   const row=await db().prepare('SELECT * FROM questions WHERE id=? AND student_id=?').bind(typeof body.questionId==='string'?body.questionId:'',s.id).first<any>();if(!row)return fail('This question was not found. Please load another question.',404);
+  if((row.assignment_id||null)!==assignmentId(body.assignmentId))return fail('Open this question from its original assignment or free practice.');
+  const a=await coursework.access(s.id,row.assignment_id,row.topic_id);
   const q=generateQuestion(row.topic_id,row.seed,row.level);
   if(action==='hint'){await db().prepare('UPDATE questions SET hint_used=1,updated_at=? WHERE id=? AND correct=0 AND revealed=0').bind(now,row.id).run();return json({hint:q.hint});}
-  if(action==='solution'){await db().prepare('UPDATE questions SET revealed=1,updated_at=? WHERE id=? AND correct=0').bind(now,row.id).run();return json({steps:q.steps,answer:q.answer,progress:await progressFor(s.id)});}
-  if(row.correct)return json({correct:true,independent:!!row.independent,steps:q.steps,progress:await progressFor(s.id)});
+  if(action==='solution'){await db().prepare('UPDATE questions SET revealed=1,updated_at=? WHERE id=? AND correct=0').bind(now,row.id).run();return json({steps:q.steps,answer:q.answer,progress:await progressFor(s.id),assignmentProgress:await coursework.sync(s.id,a)});}
+  if(row.correct)return json({correct:true,independent:!!row.independent,steps:q.steps,progress:await progressFor(s.id),assignmentProgress:await coursework.sync(s.id,a)});
   if(row.revealed)return fail('You have reviewed this solution. Try a fresh question to practice on your own.');
   if(typeof body.answer!=='string'||parseAnswer(body.answer)===null)return fail('Enter a number, decimal, or fraction, such as −3, 0.5, or 1/2.');
   const correct=isCorrect(body.answer,q.answer);
   const updated=await db().prepare('UPDATE questions SET attempts=attempts+1,correct=?,independent=CASE WHEN attempts=0 AND hint_used=0 AND revealed=0 THEN ? ELSE 0 END,last_answer=?,updated_at=? WHERE id=? AND student_id=? AND correct=0 AND revealed=0 RETURNING *').bind(correct?1:0,correct?1:0,body.answer.slice(0,80),now,row.id,s.id).first<any>();
   if(!updated)return fail('This question has already been checked. Load a fresh question.');
   await db().prepare('UPDATE students SET last_seen=?,current_topic=?,current_stage=? WHERE id=?').bind(now,row.topic_id,'practice',s.id).run();
-  return json({correct,independent:!!updated.independent,attempts:updated.attempts,steps:correct?q.steps:undefined,message:correct?'You got it!':`Not quite yet. ${updated.attempts>1?q.hint:'Check the operation and try again. You can also ask for a hint.'}`,progress:await progressFor(s.id)});
+  return json({correct,independent:!!updated.independent,attempts:updated.attempts,steps:correct?q.steps:undefined,message:correct?'You got it!':`Not quite yet. ${updated.attempts>1?q.hint:'Check the operation and try again. You can also ask for a hint.'}`,progress:await progressFor(s.id),assignmentProgress:await coursework.sync(s.id,a)});
  }
  return fail('Action not found.',404);
- }catch(e){console.error('MathHub POST failed',e);return fail('We could not save that just now. Your answer is still on screen; please try again.',503);}}
+ }catch(e){if(e instanceof CourseworkError)return fail(e.message,e.status);console.error('MathHub POST failed',e);return fail('We could not save that just now. Your answer is still on screen; please try again.',503);}}
