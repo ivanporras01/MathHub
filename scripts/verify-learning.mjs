@@ -75,7 +75,7 @@ for(const id of ['6-fractions','7-rational','7-percent','8-percent','8-exponents
  }
 }
 await writeFile(path.join(out,'parallel-lab.html'),renderToStaticMarkup(React.createElement(ParallelLab)));
-console.log(`PASS: ${rendered}/72 full lessons rendered; ${configurations} independently checked angle configurations; ${modelStates} specialist model boundary states.`);
+console.log(`PASS: ${rendered}/${TOPICS.length} full lessons rendered; ${configurations} independently checked angle configurations; ${modelStates} specialist model boundary states.`);
 
 // Assignment percentages represent all topic milestones, independently of lifetime progress.
 const {taskSummary}=await load('coursework');

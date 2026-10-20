@@ -1,6 +1,6 @@
 # MathHub by Mr. Porras
 
-An independent MathHub classroom with six courses and 72 original introductory practice topics: 6th Grade Math, 7th Grade Math, Pre-Algebra, Algebra 1, Algebra 2, and Geometry. Each course has 12 topics with explanations, illustrations, worked examples, guided steps, fresh numeric practice, hints, and solutions. This is an introductory practice collection, not a complete course or a formal gradebook.
+An independent MathHub classroom with six courses and 73 original introductory practice topics: 6th Grade Math, 7th Grade Math, Pre-Algebra, Algebra 1, Algebra 2, and Geometry. Algebra 2 has 13 topics; each other course has 12 topics with explanations, illustrations, worked examples, guided steps, fresh numeric practice, hints, and solutions. This is an introductory practice collection, not a complete course or a formal gradebook.
 
 ## Student access and progress
 
@@ -21,6 +21,16 @@ New questions use a versioned negative seed; old unsigned inequality questions r
 The shared Transformations lab in Pre-Algebra and Geometry now starts with a visible coordinate editor. Students can enter one point or a polygon with 3–8 vertices, including signed integers, decimals, and fractions from −50 to 50. **Draw my figure** validates the complete draft before changing the graph. Missing/invalid coordinates, repeated vertices, crossing edges, and polygons with no area receive specific feedback; invalid edits keep the previous figure intact.
 
 Students then choose a reflection, rotation (90°, 180°, or 270° in either direction), translation, or dilation and select **Apply transformation**. Changing the transformation hides the previous image until it is applied again. Original and image vertices appear together on equal-scale axes with a before/after coordinate table, rotation traces, and step-by-step correspondence. Rotations and dilations use the origin. Custom coordinate inputs replace the old whole-figure position sliders, so the original figure matches the entered coordinates exactly. Exploration does not alter scored practice progress.
+
+## Transformation compositions and polynomial studio
+
+Geometry and Pre-Algebra include a composition explorer for reflection in horizontal or vertical lines followed by translation, with an order-reversal comparison. It reproduces the three worksheet examples for P(1, 1), m: y = 2 and n: x = −1. Original, intermediate and final images have distinct colors, line styles, vertex symbols, coordinate labels and a table. Students can edit their point or whole polygon; the existing rotation/dilation explorer remains available.
+
+Algebra 2 adds **Multiplication of polynomials**, including signed binomial and trinomial products, a clickable distributive grid, like-power collection, and guided/scored questions. The same studio expands Algebra 1 polynomial operations, Algebra 2 division, and rational expressions. Division shows leading-term division, multiplication, whole-product subtraction, aligned coefficient rows, zero placeholders, remainders, and synthetic division for monic linear divisors. Custom polynomial inputs accept bounded integer coefficients; custom division outputs can be rounded.
+
+The rational-expression explorer covers multiplication, division, addition and subtraction with factoring, common denominators and all original domain exclusions, including zeros of the divisor. Its examples are original teaching examples of the worksheet's operation types, not a transcription of the photographed handwriting.
+
+Existing topic IDs and order are preserved; the new topic is appended. No existing question generators, database schemas, student records, teacher credentials, or classroom assignments are changed.
 
 ## Professor access
 
@@ -86,7 +96,7 @@ Schema version 2 adds nullable school/contact columns and a support-settings tab
 - `npx wrangler deploy --config wrangler.cloudflare.json --dry-run --outdir work/worker`
 - `node scripts/verify-worker.mjs`
 
-Math checks independently calculate 12,960 questions across all 72 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. The migration test also exercises version-1 and version-2 records, repeat startup, and unchanged profile/question/progress/session IDs. Shared coursework checks run against both adapters and the actual Worker: enrollment, separate task credit, student/teacher authorization, hints/retries, completion timestamps, help context, archive/reopen behavior, returning students, and removal.
+Math checks independently calculate 13,140 questions across all 73 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. The migration test also exercises version-1 and version-2 records, repeat startup, and unchanged profile/question/progress/session IDs. Shared coursework checks run against both adapters and the actual Worker: enrollment, separate task credit, student/teacher authorization, hints/retries, completion timestamps, help context, archive/reopen behavior, returning students, and removal.
 
 ## Content references
 

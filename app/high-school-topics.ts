@@ -647,5 +647,23 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
     "mistake": "A cone's volume needs the factor 1/3; its perpendicular height is not its slant height.",
     "visual": "volume",
     "standard": "Introductory practice"
-  }
+  },
+{
+  "id": "10-multiplication",
+  "grade": 10,
+  "title": "Multiplication of polynomials",
+  "category": "Algebra 2",
+  "color": "lavender",
+  "minutes": 20,
+  "description": "Use a signed-term grid to expand and combine polynomials of any length.",
+  "idea": "Multiplying polynomials means distributing every term of one factor to every term of the other. A multiplication grid makes every product visible. Combine only terms with matching powers.",
+  "rules": [
+    "Multiply every pair of terms, including negative terms and constants.",
+    "Multiply coefficients and add exponents for products of the same variable.",
+    "Group like powers and add their signed coefficients; write the result in descending powers."
+  ],
+  "mistake": "(x − 4)² is x² − 8x + 16. Omitting the two middle products gives an incorrect result.",
+  "visual": "polynomial",
+  "standard": "Polynomial arithmetic"
+}
 ];
