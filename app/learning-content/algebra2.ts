@@ -41,7 +41,7 @@ export const algebra2:Record<string,LearningContent>={
 'Divide x² + 5x + 7 by x + 2.',
 [['x²/(x) = x; subtract x(x + 2) to leave 3x + 7','Cancel the leading term first.'],['3x/x = 3; subtract 3(x + 2) to leave 1','Quotient x + 3, remainder 1. Check (x + 2)(x + 3) + 1 = x² + 5x + 7.']],
 {question:'If P(x) is divided by x − 2, what is the remainder?',options:[['P(−2)','The divisor is zero at 2, not −2.'],['Always zero','A zero remainder happens only when x − 2 is a factor.'],['P(2)','Substitute x = 2 into P(x) = (x − 2)Q(x) + r.']],correct:2},
-['The rectangle model shows a zero remainder. What does that say about the divisor?','It is an exact factor of the dividend. A nonzero remainder would leave an extra term.']),
+['Choose the missing-power example. Why must a zero coefficient appear in synthetic division?','The zero keeps the coefficients in their correct power columns. Check the quotient and remainder by multiplying back and adding the remainder.']),
 '10-zeros':lesson('Relate factors, multiplicity, and graph behavior at real zeros.','Recall factoring and the zero-product property.',
 [['Multiplicity','How many times a factor is repeated.'],['Factor theorem','P(r) = 0 exactly when x − r is a factor of P(x).']],
 [['Read zeros from factors','A factor x − r becomes zero at r. A constant multiplier that is nonzero changes vertical scale, not the zeros.'],['Repeated factors affect crossings','At a real zero of even multiplicity, a polynomial touches the axis and turns back. At odd multiplicity it crosses; higher multiplicity can flatten the graph.']],
@@ -84,4 +84,12 @@ export const algebra2:Record<string,LearningContent>={
 [['x² = x + 2 → (x − 2)(x + 1) = 0','Substitute and factor to find x = 2 or −1.'],['Solutions: (2, 4) and (−1, 1)','Both points satisfy the parabola and the line.']],
 {question:'How many real solutions do y = x² and y = −1 have?',options:[['None','A real square is nonnegative, so the parabola never reaches −1.'],['One','They would touch at y = 0, not y = −1.'],['Two','Two intersections occur for a positive horizontal height.']],correct:0},
 ['Slide the horizontal line through negative, zero, and positive heights.','The number of real intersections changes from zero to one to two.']),
+
+'10-multiplication':lesson('Expand polynomial products and justify each term with the distributive property.','Recall signed multiplication, exponent rules, and like terms.',
+[['Coefficient','The numeric factor of a term, including its sign.'],['Like terms','Terms with exactly the same variable powers.'],['Degree','The highest exponent with a nonzero coefficient.']],
+[['Every term must be distributed','A polynomial with m terms times one with n terms has m × n pairwise products before combining. A grid prevents missing a product.'],['Multiplication and addition use different exponent rules','(2x²)(−3x³) = −6x⁵. But 2x² + 3x² = 5x²: combining like terms does not change their powers.'],['Special products follow the same rule','(a + b)² = a² + 2ab + b². (a + b)(a − b) = a² − b² because the middle terms cancel.']],
+'Expand (x − 2)(x² + 2x + 3).',
+[['Distribute x: x³ + 2x² + 3x','Multiply x by all three terms.'],['Distribute −2: −2x² − 4x − 6','Keep the negative sign with the coefficient.'],['Combine: x³ − x − 6','The x² terms cancel; 3x − 4x = −x.']],
+{question:'Which is the expansion of (x − 4)²?',options:[['x² + 16','This misses both −4x products.'],['x² − 8x + 16','All four products combine to this expression.'],['x² − 16','That is (x + 4)(x − 4), a different product.']],correct:1},
+['Compare a binomial product with a binomial × trinomial. How many grid cells must be multiplied?','Two binomials need 4 cells; a binomial × trinomial needs 6. Every cell contributes, even when like terms later cancel.']),
 };

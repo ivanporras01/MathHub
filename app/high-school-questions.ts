@@ -6,6 +6,25 @@ const factor=(n:number)=>`(x ${sign(-n)})`;
 export function generateHighSchoolQuestion(id:string,seed:number,level=1):Question{
  const r=seeded(seed),a=r(2,level>1?9:5),b=r(2,7),c=r(1,5),v=r(0,2);
  switch(id){
+
+ case '10-multiplication':{
+  const lead=a,constant=v===0?-b:b,linear=v===1?-c:c,tail=v===2?-a:a;
+  if(level>1){
+   const coefficient=lead*tail+constant*linear;
+   return Q('Expand the product. Enter the coefficient of x.',coefficient,'Distribute each term to all three terms. The x terms come from ax × the constant and the constant × the linear term.',
+    [S('Distribute the leading term','Multiply ax by each term of the trinomial.',lead+'x³ '+sign(lead*linear)+'x² '+sign(lead*tail)+'x','What is its x coefficient?',lead*tail),
+     S('Distribute the constant','Keep its sign attached.',constant+'x² '+sign(constant*linear)+'x '+sign(constant*tail),'What x coefficient does this row contribute?',constant*linear),
+     S('Combine like terms','Add only matching powers.',lead+'x³ '+sign(lead*linear+constant)+'x² '+sign(coefficient)+'x '+sign(constant*tail),'What is the final x coefficient?',coefficient)],
+    '('+lead+'x '+sign(constant)+')(x² '+sign(linear)+'x '+sign(tail)+')',undefined,'Enter only the coefficient of x. All six products appear in the worked solution.');
+  }
+  const coefficient=lead*linear+constant;
+  return Q('Expand the product. Enter the coefficient of x.',coefficient,'A binomial product has four products. Add the two linear coefficients.',
+   [S('Multiply the first row','Distribute the first term.',lead+'x² '+sign(lead*linear)+'x','What x coefficient comes from this row?',lead*linear),
+    S('Multiply the second row','Distribute the signed constant.',constant+'x '+sign(constant*linear),'What x coefficient comes from this row?',constant),
+    S('Combine like terms','Add the two x coefficients.',lead+'x² '+sign(coefficient)+'x '+sign(constant*linear),'What is the final x coefficient?',coefficient)],
+   '('+lead+'x '+sign(constant)+')(x '+sign(linear)+')',undefined,'Enter the numeric coefficient, including its sign.');
+ }
+
  case '9-expressions':return buildExpressionQuestion(seed,level);
  case '9-equations':{const x=v===0?-c:c,total=a*(x+b)-c;return Q('Solve for x.',x,'Distribute, combine constants, and undo multiplication.',[S('Distribute','Multiply every term in parentheses.',`${a}x + ${a*b} − ${c} = ${total}`,'What constant remains on the left?',a*b-c),S('Move the constant','Subtract the same constant from both sides.',`${a}x = ${total} − (${a*b-c}) = ${a*x}`,'What is the right-hand value?',a*x),S('Divide and check','Divide both sides by the coefficient.',`x = ${x}; check: ${a}(${x} + ${b}) − ${c} = ${total}`,'What is x?',x)],`${a}(x + ${b}) − ${c} = ${total}`);}
  case '9-inequalities':{const k=v===0?-b:b,coef=-a,total=coef*k+c;return Q('The solution is x < k. What is k?',k,'Subtract the constant, then divide by the negative coefficient and reverse the inequality.',[S('Undo addition','Subtract the constant on both sides.',`${coef}x > ${total-c}`,'What is the new right-hand value?',total-c),S('Divide and reverse','Dividing by a negative reverses > to <.',`x < ${k}`,'What is the boundary k?',k),S('Check the direction','A value below the boundary satisfies the inequality.',`x = ${k-1}: ${coef*(k-1)+c} > ${total}`,'What value one below the boundary did we check?',k-1)],`${coef}x + ${c} > ${total}`,undefined,'Enter only the boundary k; the full solution is an inequality.');}
