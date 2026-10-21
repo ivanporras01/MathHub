@@ -309,16 +309,16 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
   {
     "id": "10-division",
     "grade": 10,
-    "title": "Polynomial division",
+    "title": "Operations with Polynomials",
     "category": "Algebra 2",
     "color": "mint",
-    "minutes": 10,
-    "description": "Find a quotient and account for any remainder.",
-    "idea": "Polynomial division reverses polynomial multiplication. The dividend equals the divisor times the quotient plus the remainder.",
+    "minutes": 30,
+    "description": "Division, multiplication, addition, and subtraction—with all 13 original worksheet solutions.",
+    "idea": "Polynomial operations combine like terms, distribute products, or reverse multiplication through division. Algebraic fractions use these same rules while preserving their original restrictions.",
     "rules": [
-      "Arrange terms by descending powers.",
-      "Divide, multiply and subtract until the remainder has lower degree.",
-      "Check using divisor × quotient + remainder."
+      "Align matching powers for addition and subtraction; change every sign when subtracting a polynomial.",
+      "Distribute every term when multiplying. For division, divide leading terms, multiply, subtract, and repeat.",
+      "For fractions, record restrictions, factor, and use a common denominator or the divisor’s reciprocal as needed."
     ],
     "mistake": "A remainder cannot be dropped when rewriting a rational expression.",
     "visual": "polynomial",
@@ -345,11 +345,11 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
   {
     "id": "10-rational",
     "grade": 10,
-    "title": "Rational expressions",
+    "title": "Rational expressions & graphs",
     "category": "Algebra 2",
     "color": "peach",
     "minutes": 10,
-    "description": "Simplify algebraic fractions while preserving restrictions.",
+    "description": "Simplify algebraic fractions and graph asymptotes, holes, intercepts, domain, and range.",
     "idea": "A rational expression is a quotient of polynomials. Values that make the original denominator zero must stay excluded.",
     "rules": [
       "Identify excluded values from the original denominator.",
@@ -363,11 +363,11 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
   {
     "id": "10-radicals",
     "grade": 10,
-    "title": "Radical equations",
+    "title": "Radical equations & graphs",
     "category": "Algebra 2",
     "color": "yellow",
     "minutes": 10,
-    "description": "Solve equations that contain a root and check the result.",
+    "description": "Graph square-root functions with transformations, then solve radical equations and check candidates.",
     "idea": "Raising both sides to a power can help remove a radical. That step can also introduce answers that fail in the original equation.",
     "rules": [
       "Isolate the radical before applying a power.",
@@ -665,5 +665,19 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
   "mistake": "(x − 4)² is x² − 8x + 16. Omitting the two middle products gives an incorrect result.",
   "visual": "polynomial",
   "standard": "Polynomial arithmetic"
+},
+{
+ "id": "10-addition", "grade":10, "title":"Addition of polynomials", "category":"Algebra 2", "color":"blue", "minutes":20,
+ "description":"Align like powers and add signed coefficients.",
+ "idea":"Like terms share the same variable and exponent. Combine their signed coefficients and keep the power unchanged.",
+ "rules":["Write descending powers and include zero placeholders.","Keep the sign of each term when adding.","Combine matching powers and omit zero terms."],
+ "mistake":"Adding like terms never adds their exponents.", "visual":"polynomial", "standard":"Polynomial arithmetic"
+},
+{
+ "id": "10-subtraction", "grade":10, "title":"Subtraction of polynomials", "category":"Algebra 2", "color":"peach", "minutes":20,
+ "description":"Distribute the minus sign to every term, then combine like powers.",
+ "idea":"Like terms share the same variable and exponent. Combine their signed coefficients and keep the power unchanged.",
+ "rules":["Write descending powers and include zero placeholders.","Change EVERY sign in the second polynomial before adding.","Combine matching powers and omit zero terms."],
+ "mistake":"A minus before parentheses changes every sign, including negative constants.", "visual":"polynomial", "standard":"Polynomial arithmetic"
 }
 ];

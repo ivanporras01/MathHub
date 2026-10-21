@@ -1,6 +1,7 @@
 'use client';
 import {useId,useState} from 'react';
 import {parseAnswer} from './curriculum';
+import type {PolynomialOperation} from './polynomial-operations-model';
 type RationalExample={title:string;left:[string,string];right:[string,string];operation:string;excluded:number[];steps:[string,string][];result:[string,string];evaluate:(x:number)=>number;check:(x:number)=>number};
 export const RATIONAL_EXAMPLES:RationalExample[]=[
  {title:'Multiply',left:['x² − 9','x² − x − 6'],right:['x − 2','x + 3'],operation:'×',excluded:[3,-2,-3],
@@ -17,11 +18,11 @@ export const RATIONAL_EXAMPLES:RationalExample[]=[
  result:['x² + 5','x² − 1'],evaluate:x=>(x+2)/(x-1)-3/(x+1),check:x=>(x*x+5)/(x*x-1)}
 ];
 function Fraction({parts}:{parts:[string,string]}){return <span className="am-fraction" aria-label={'('+parts[0]+') divided by ('+parts[1]+')'}><span>{parts[0]}</span><span>{parts[1]}</span></span>;}
-export default function RationalLab(){
- const [index,setIndex]=useState(0),[step,setStep]=useState(0),[input,setInput]=useState('0'),[feedback,setFeedback]=useState(''),id=useId(),e=RATIONAL_EXAMPLES[index];
+export default function RationalLab({initialOperation='multiply',showOperationPicker=true}:{initialOperation?:PolynomialOperation;showOperationPicker?:boolean}){
+ const [index,setIndex]=useState({multiply:0,divide:1,add:2,subtract:3}[initialOperation]),[step,setStep]=useState(3),[input,setInput]=useState('0'),[feedback,setFeedback]=useState(''),id=useId(),e=RATIONAL_EXAMPLES[index];
  return <div>
  <p>A rational expression is a quotient of polynomials. Start by identifying where the original expression is undefined. Division also requires the entire divisor to be nonzero.</p>
- <div className="am-preset-row">{RATIONAL_EXAMPLES.map((v,i)=><button className="button light" key={v.title} aria-pressed={index===i} onClick={()=>{setIndex(i);setStep(0);setFeedback('');}}>{v.title}</button>)}</div>
+ {showOperationPicker&&<div className="am-preset-row">{RATIONAL_EXAMPLES.map((v,i)=><button className="button light" key={v.title} aria-pressed={index===i} onClick={()=>{setIndex(i);setStep(3);setFeedback('');}}>{v.title}</button>)}</div>}
  <div className="am-equation"><span className="am-original"><Fraction parts={e.left}/></span> {e.operation} <span className="am-middle"><Fraction parts={e.right}/></span></div>
  <div className="am-rule">Original restrictions: x ≠ {e.excluded.join(', ')}.</div>
  <ol className="am-rational-steps">{e.steps.slice(0,step+1).map(([title,body],i)=><li key={title}><span className="am-step-number">{i+1}</span><div><h3>{title}</h3><p>{body}</p></div></li>)}</ol>
