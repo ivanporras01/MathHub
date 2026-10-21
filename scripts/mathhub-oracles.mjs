@@ -24,6 +24,7 @@ case '9-polynomials':return e[0]+e[1];
 case '9-factoring':return (p[0]-Math.sqrt(p[0]**2-4*p[1]))/2;
 case '9-quadratics':return (-e[0]+Math.sqrt(e[0]**2-4*e[1]))/2;
 case '9-exponential':return p[0]*(q.prompt.includes('halves')?.5:2)**p[1];
+case '10-addition':case '10-subtraction':{const degree=e.length/2-1,power=Number(q.prompt.match(/x\^(\d+)/)[1]);return e[degree-power]+(id==='10-subtraction'?-1:1)*e[2*degree+1-power];}
 case '10-multiplication':{const values=N(q.expression);return q.expression.includes('x²')?values[0]*values[3]+values[1]*values[2]:values[0]*values[2]+values[1];}
 case '10-transformations':return -e[0];
 case '10-composition':return p[0]*(p[3]**2+p[2])+p[1];

@@ -1,6 +1,6 @@
 # MathHub by Mr. Porras
 
-An independent MathHub classroom with six courses and 73 original introductory practice topics: 6th Grade Math, 7th Grade Math, Pre-Algebra, Algebra 1, Algebra 2, and Geometry. Algebra 2 has 13 topics; each other course has 12 topics with explanations, illustrations, worked examples, guided steps, fresh numeric practice, hints, and solutions. This is an introductory practice collection, not a complete course or a formal gradebook.
+An independent MathHub classroom with six courses and 75 original introductory practice topics: 6th Grade Math, 7th Grade Math, Pre-Algebra, Algebra 1, Algebra 2, and Geometry. Algebra 2 has 15 topics; each other course has 12 topics with explanations, illustrations, worked examples, guided steps, fresh numeric practice, hints, and solutions. This is an introductory practice collection, not a complete course or a formal gradebook.
 
 ## Student access and progress
 
@@ -96,7 +96,7 @@ Schema version 2 adds nullable school/contact columns and a support-settings tab
 - `npx wrangler deploy --config wrangler.cloudflare.json --dry-run --outdir work/worker`
 - `node scripts/verify-worker.mjs`
 
-Math checks independently calculate 13,140 questions across all 73 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. The migration test also exercises version-1 and version-2 records, repeat startup, and unchanged profile/question/progress/session IDs. Shared coursework checks run against both adapters and the actual Worker: enrollment, separate task credit, student/teacher authorization, hints/retries, completion timestamps, help context, archive/reopen behavior, returning students, and removal.
+Math checks independently calculate 13,500 questions across all 75 topics. Both server variants are tested for scoring, progress persistence, returning students, authorization, hints, retries, help, removal, session expiry, rate limits, and secure cookies including 30-day sign-in. The standalone Worker bundle is also checked in the Cloudflare SQLite runtime. Test-only credentials in these scripts are public fixtures and must never be used in production. The migration test also exercises version-1 and version-2 records, repeat startup, and unchanged profile/question/progress/session IDs. Shared coursework checks run against both adapters and the actual Worker: enrollment, separate task credit, student/teacher authorization, hints/retries, completion timestamps, help context, archive/reopen behavior, returning students, and removal.
 
 ## Content references
 
@@ -106,3 +106,12 @@ The original explanations and generators draw on mathematics domains represented
 - https://www.thecorestandards.org/Math/Content/6/introduction/
 - https://www.thecorestandards.org/Math/Content/7/introduction/
 - https://www.thecorestandards.org/Math/Content/8/introduction/
+
+
+## Operations with Polynomials and graphing studios
+
+The existing `10-division` topic is now titled **Operations with Polynomials**. Its ID and position are unchanged, preserving saved progress and seeded question sequences. Four visible operation buttons lead to ordinary polynomial work and the original 13-problem worksheet, transcribed from the supplied image. The small denominator exponent in problem 3 is ambiguous in the photo, so both 4x² and 4x³ readings are explicitly selectable with complete solutions. Full solutions include factorization, common denominators, sign distribution, complex fractions, domain restrictions, and rejection of the excluded candidate in problem 12. Standalone addition and subtraction lessons are appended after the existing 73 topics, with authored lessons and scored practice.
+
+The rational-expressions lesson now includes the supplied graphing problems 18–20: `6/(x+2)+3`, `(3x+6)/(x−1)`, and `(x²−7x+6)/(x−1)`. It teaches graph construction with asymptotes, intercepts, sample tables, domain and range, and the open circle at `(1,−5)` for problem 20. The radical-equations lesson also includes a square-root/cube-root graphing studio with transformations, point tables, domain/range reasoning, and input checks; the previous equation-solving exploration is retained.
+
+Direct links: `/?topic=10-division`, `/?topic=10-addition`, `/?topic=10-subtraction`, `/?topic=10-multiplication`, `/?topic=10-rational`, and `/?topic=10-radicals`.

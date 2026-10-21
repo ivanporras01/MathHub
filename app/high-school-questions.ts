@@ -7,6 +7,22 @@ export function generateHighSchoolQuestion(id:string,seed:number,level=1):Questi
  const r=seeded(seed),a=r(2,level>1?9:5),b=r(2,7),c=r(1,5),v=r(0,2);
  switch(id){
 
+ case '10-addition':case '10-subtraction':{
+  const subtract=id==='10-subtraction',direction=subtract?-1:1,degree=level>1?3:2;
+  const first=degree===3?[c,-b,0,a]:[c,-b,a];
+  const second=degree===3?[v===2?-b:b,v===1?-a:a,v===0?-c:c,-c]:[v===2?-b:b,v===1?-a:a,v===0?-c:c];
+  const target=r(0,degree),answer=first[target]+direction*second[target];
+  const polynomial=(coefficients:number[],keepZeros=false)=>{const terms:string[]=[];for(let p=coefficients.length-1;p>=0;p--){const n=coefficients[p];if(!n&&!keepZeros)continue;const body=Math.abs(n)+(p===0?'':p===1?'x':p===2?'x²':'x³');terms.push((terms.length?(n<0?' − ':' + '):(n<0?'−':''))+body);}return terms.join('')||'0';};
+  const adjusted=second.map(n=>direction*n),combined=first.map((n,i)=>n+adjusted[i]);
+  return Q((subtract?'Subtract':'Add')+' the polynomials. Enter the coefficient of x^'+target+'.',answer,
+   subtract?'Change every sign in the second polynomial, then combine the matching powers.':'Align matching powers and add their signed coefficients.',
+   [S(subtract?'Change every sign':'Keep the signed terms',subtract?'Multiply the entire second polynomial by −1.':'Addition preserves the signs of the second polynomial.',polynomial(adjusted,true),'What is its coefficient of x^'+target+'?',adjusted[target]),
+    S('Combine the requested column','Add coefficients without changing the exponent.',first[target]+' + ('+adjusted[target]+') = '+answer,'What is the coefficient of x^'+target+'?',answer),
+    S('Write the full result','Combine every column and omit zero terms.',polynomial(combined),'What is the requested coefficient?',answer)],
+   '('+polynomial(first,true)+') '+(subtract?'−':'+')+' ('+polynomial(second,true)+')',undefined,'x^0 means the constant term. Enter only the requested numeric coefficient.');
+ }
+
+
  case '10-multiplication':{
   const lead=a,constant=v===0?-b:b,linear=v===1?-c:c,tail=v===2?-a:a;
   if(level>1){

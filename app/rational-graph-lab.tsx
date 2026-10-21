@@ -1,0 +1,22 @@
+'use client';
+import {useId,useState} from 'react';
+import FunctionGraph from './function-graph';
+import {RATIONAL_GRAPHS,graphValue} from './rational-graph-model';
+import {WorksheetMath} from './polynomial-worksheet';
+import {parseAnswer} from './curriculum';
+import './advanced-math-labs.css';
+export default function RationalGraphLab(){
+ const [index,setIndex]=useState(0),[stage,setStage]=useState(2),[input,setInput]=useState('0'),[feedback,setFeedback]=useState(''),id=useId(),e=RATIONAL_GRAPHS[index];
+ const point=(x:number,y:number)=>({x,y,label:'('+x+', '+y+')'}),points=stage>=1?[point(e.xIntercept,0),point(0,e.yIntercept)]:[];
+ if(e.hole)points.push({...point(...e.hole),open:true} as typeof points[number]);
+ return <section className="am-lab" aria-labelledby={id+'title'}><span className="eyebrow">GRAPH THE FUNCTIONS FROM YOUR WORKSHEET</span><h2 id={id+'title'}>Rational functions: asymptotes, holes, and intercepts</h2><p>These are rational functions: quotients of polynomials. A cancelled denominator factor produces a hole; a remaining denominator zero can produce a vertical asymptote.</p>
+ <nav className="am-preset-row" aria-label="Rational graph examples">{RATIONAL_GRAPHS.map((v,i)=><button className="button light" key={v.number} aria-pressed={i===index} onClick={()=>{setIndex(i);setStage(2);setFeedback('');}}>Problem {v.number}</button>)}</nav>
+ <WorksheetMath parts={['f(x) = ',{top:e.numerator!,bottom:e.denominator!},e.shift||'']}/>
+ <div className="am-two-columns"><div><FunctionGraph fn={e.fn} breaks={e.vertical===undefined?[]:[e.vertical]} vertical={e.vertical} horizontal={e.horizontal} points={points} showCurve={stage===2} title={e.formula+'. '+e.reduced+(e.hole?'. Open circle at (1, −5).':'. Dashed asymptotes shown.')}/><div className="am-legend"><span className="am-original">Blue: graph / included points</span><span className="am-middle">Dashed: asymptotes · Open circle: hole</span></div><div className="am-preset-row">{['1. Restrictions & asymptotes','2. Add intercepts','3. Draw the graph'].map((label,i)=><button className="button light small" aria-pressed={stage===i} key={label} onClick={()=>setStage(i)}>{label}</button>)}</div><p className="am-note">The viewing window is −10 to 10 on each axis. Curves continue beyond the window; the window does not limit the domain or range.</p></div>
+ <div><h3>Read the graph</h3><dl className="am-graph-facts"><dt>Horizontal asymptote</dt><dd>{e.horizontal===undefined?'None':'y = '+e.horizontal}</dd><dt>Vertical asymptote</dt><dd>{e.vertical===undefined?'None':'x = '+e.vertical}</dd><dt>Hole</dt><dd>{e.hole?'('+e.hole.join(', ')+')':'None'}</dd><dt>x-intercept</dt><dd>({e.xIntercept}, 0)</dd><dt>y-intercept</dt><dd>(0, {e.yIntercept})</dd><dt>Domain</dt><dd>All real x except {e.excluded}</dd><dt>Range</dt><dd>All real y except {e.rangeExcluded}</dd></dl>
+ <div className="am-table-wrap"><table><caption>Choose points on both sides of the excluded input</caption><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody>{e.samples.map(x=><tr key={x}><td>{x}</td><td>{graphValue(e,x)===null?'Undefined (hole)':Number(e.fn(x).toFixed(3))}</td></tr>)}</tbody></table></div></div></div>
+ <h3>How to build this graph</h3><ol className="am-rational-steps">{e.steps.map(([title,math,why],i)=><li key={title}><span className="am-step-number">{i+1}</span><div><h3>{title}</h3><div className="am-equation">{math}</div><p>{why}</p></div></li>)}</ol>
+ <form className="am-predict" onSubmit={event=>{event.preventDefault();const x=parseAnswer(input);if(x===null||Math.abs(x)>100){setFeedback('Enter a number between −100 and 100.');return;}const y=graphValue(e,x);setFeedback(y===null?(e.hole?'Undefined: this is the hole. The simplified line cannot restore the missing input.':'Undefined: the original denominator is zero at the vertical asymptote.'):'f('+x+') ≈ '+Number(y.toFixed(5))+'. This point belongs to the function.');}}><label htmlFor={id+'input'}>Test a point, including the excluded input</label><div className="am-preset-row"><input id={id+'input'} value={input} onChange={event=>setInput(event.target.value)}/><button className="button light">Evaluate</button></div><p role="status">{feedback}</p></form>
+ <p className="am-note">A horizontal asymptote is not automatically excluded from every rational function’s range. Here the first two equations cannot output 3; the algebra above explains why.</p>
+ </section>;
+}

@@ -35,7 +35,7 @@ function oracle(id,q){const e=nums(q.expression),p=nums(q.prompt);switch(id){
  case'8-transformations':return q.prompt.includes('moves')?p[0]+p[2]:q.prompt.includes('Reflect')?-p[1]:p[0]*p[2];
  default:return extraOracle(id,q);
 }}
-assert.equal(TOPICS.length,73);for(const g of [6,7,8,9,10,11])assert.equal(TOPICS.filter(t=>t.grade===g).length,g===10?13:12);
+assert.equal(TOPICS.length,75);for(const g of [6,7,8,9,10,11])assert.equal(TOPICS.filter(t=>t.grade===g).length,g===10?15:12);
 let checked=0;for(const t of TOPICS){assert.equal(t.rules.length,3);for(let i=1;i<=180;i++){const q=generateQuestion(t.id,(i*2654435761)>>>0,1+i%3),expected=oracle(t.id,q);assert.ok(Math.abs(q.answer-expected)<1e-7,`${t.id}: ${q.prompt} ${q.expression}; expected ${expected}, got ${q.answer}`);assert.ok(Number.isFinite(q.answer));assert.ok(q.steps.length>=2&&q.steps.every(s=>s.ask&&s.math&&Number.isFinite(s.answer)));assert.ok(isCorrect(String(expected),q.answer));assert.ok(isCorrect(expected.toFixed(6),q.answer));assert.equal(isCorrect(String(q.answer+1),q.answer),false);checked++;}}
 for(const [raw,expected] of [['3/4',.75],['-1 1/2',-1.5],['−0.5',-.5],['1,000',1000],['.25',.25]])assert.equal(parseAnswer(raw),expected);
 for(const raw of ['','1/0','abc','Infinity','3+4','1e999'])assert.equal(parseAnswer(raw),null);
