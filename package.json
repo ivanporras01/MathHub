@@ -7,7 +7,7 @@
   },
   "scripts": {
     "install:ci": "bash scripts/install-pnpm.sh",
-    "dev": "wrangler dev --config wrangler.cloudflare.json",
+    "dev": "node scripts/dev-cloudflare.mjs",
     "build": "vite build --config vite.cloudflare.config.ts",
     "start": "wrangler dev --config wrangler.cloudflare.json",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
