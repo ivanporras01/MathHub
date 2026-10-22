@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import React from 'react';
+import './verify-graphing.mjs';
 import {renderToStaticMarkup} from 'react-dom/server';
 // verify-learning compiles the actual TypeScript modules, not a duplicate model.
 const core=await import('../work/learning-verification/advanced-math-model.mjs');

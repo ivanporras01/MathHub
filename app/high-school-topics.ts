@@ -183,11 +183,11 @@ export const HIGH_SCHOOL_TOPICS:Topic[]=[
   {
     "id": "9-quadratics",
     "grade": 9,
-    "title": "Quadratic equations",
+    "title": "Quadratic equations & graphs",
     "category": "Algebra 1",
     "color": "mint",
     "minutes": 10,
-    "description": "Use factors to locate solutions of a quadratic equation.",
+    "description": "Graph parent parabolas and transformations; find vertices, intercepts, domain, range, and roots.",
     "idea": "When a product is zero, at least one factor must be zero. A quadratic equation can have two, one or no real solutions.",
     "rules": [
       "Set one side of the equation equal to zero.",

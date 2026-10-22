@@ -115,3 +115,13 @@ The existing `10-division` topic is now titled **Operations with Polynomials**. 
 The rational-expressions lesson now includes the supplied graphing problems 18–20: `6/(x+2)+3`, `(3x+6)/(x−1)`, and `(x²−7x+6)/(x−1)`. It teaches graph construction with asymptotes, intercepts, sample tables, domain and range, and the open circle at `(1,−5)` for problem 20. The radical-equations lesson also includes a square-root/cube-root graphing studio with transformations, point tables, domain/range reasoning, and input checks; the previous equation-solving exploration is retained.
 
 Direct links: `/?topic=10-division`, `/?topic=10-addition`, `/?topic=10-subtraction`, `/?topic=10-multiplication`, `/?topic=10-rational`, and `/?topic=10-radicals`.
+
+## Rational and quadratic graphing
+
+The rational-expressions lesson (`/?topic=10-rational`) now opens a four-part graphing studio: parent functions and variations, a graphing method, worked examples, and interactive practice. The same studio opens in quadratic mode from Algebra 1 quadratic equations and graphs, Algebra 2 function transformations, and completing the square. The existing worksheet and equation-solving labs remain available below it.
+
+Students compare `1/x`, `1/x²`, and `x²` with their transformations, change vertical and horizontal scale/shift parameters, and follow individual parent points to their images. Fifteen rational and seven quadratic examples progress from parents to multiple poles, holes, partial cancellation, slant/polynomial end behavior, completing the square, and exact range proofs. Each example builds the graph in seven steps with tables and a full feature summary. The method tab links to Khan Academy’s English rational-graphing demonstration with a pause-and-predict prompt.
+
+Practice checks asymptotes, intercepts, domain exclusions, holes, range, and applicable end-behavior guides. Students can plot and check their own points before revealing the curve. Feedback is specific to each feature; exploration completion is counted for the current session. These self-checks do not replace the existing Guided and Independent stages that record course progress.
+
+`node scripts/verify-graphing.mjs` independently verifies the 22 examples, 439 range checks, 540 transformation configurations, safe answer parsing, discontinuity rendering, and 47 rendered studio states. The existing advanced-math verification script also runs these checks. `npm run dev` accepts standard preview host/port flags through a small Wrangler adapter.

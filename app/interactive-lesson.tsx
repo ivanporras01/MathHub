@@ -6,6 +6,7 @@ import {conceptLab} from './concept-models';
 import CompositionLab from './composition-lab';
 import PolynomialOperationsLab from './polynomial-operations-lab';
 import RationalGraphLab from './rational-graph-lab';
+import GraphingStudio from './graphing-studio';
 import RadicalGraphLab from './radical-graph-lab';
 import TransformationsLab from './transformations-lab';
 import SystemsLab from './systems-lab';
@@ -18,7 +19,7 @@ import {TOPICS,type Topic} from './curriculum';
 import {TopicArt} from './ui';
 import './interactive-lesson.css';
 const round=(n:number)=>Number(n.toFixed(2));
-export default function InteractiveLesson({topic,includeRadicalGraph=true}:{topic:Topic;includeRadicalGraph?:boolean}){
+export default function InteractiveLesson({topic,includeRadicalGraph=true,includeFunctionStudio=true}:{topic:Topic;includeRadicalGraph?:boolean;includeFunctionStudio?:boolean}){
  const [a,setA]=useState(3),[b,setB]=useState(2),[c,setC]=useState(4),[chosen,setChosen]=useState<number|null>(null),[revealed,setRevealed]=useState(false),[step,setStep]=useState(0);
  if(topic.id==='11-parallel')return <ParallelLinesLab/>;
  if(topic.id==='9-inequalities')return <InequalitiesLab/>;
@@ -28,7 +29,8 @@ export default function InteractiveLesson({topic,includeRadicalGraph=true}:{topi
  if(topic.id==='10-subtraction')return <PolynomialOperationsLab initialOperation="subtract"/>;
  if(topic.id==='10-radicals'&&includeRadicalGraph)return <><RadicalGraphLab/><InteractiveLesson topic={topic} includeRadicalGraph={false}/></>;
  if(topic.id==='10-division')return <PolynomialOperationsLab/>;
- if(topic.id==='10-rational')return <><RationalGraphLab/><PolynomialOperationsLab initialOperation="multiply" preferFractions/></>;
+ if(topic.id==='10-rational')return <><GraphingStudio/><details className="am-details"><summary>Your original worksheet: graph problems 18–20</summary><RationalGraphLab/></details><details className="am-details"><summary>Review rational expressions and polynomial operations</summary><PolynomialOperationsLab initialOperation="multiply" preferFractions/></details></>;
+ if(includeFunctionStudio&&['9-quadratics','10-transformations','10-completing-square'].includes(topic.id))return <><GraphingStudio initialFamily="quadratic"/><details className="am-details"><summary>More connections: {topic.title}</summary><InteractiveLesson topic={topic} includeRadicalGraph={includeRadicalGraph} includeFunctionStudio={false}/></details></>;
  if(topic.id==='8-systems'||topic.id==='9-systems')return <SystemsLab/>;
  if(['7-expressions','8-distribute','9-expressions'].includes(topic.id))return <ExpressionsLab advanced={topic.id==='9-expressions'}/>;
  const example=generateQuestion(topic.id,81293+TOPICS.indexOf(topic)*7937,1);
