@@ -24,7 +24,7 @@ export function ExplorationPrompt({topic}:{topic:Topic}){
 
 export function ReasoningExample({topic}:{topic:Topic}){
  const example=LEARNING_CONTENT[topic.id].example;
- return <article className="lesson-panel learning-example" id={`reason-${topic.id}`}><span className="eyebrow">SEE THE REASONING</span><h2>A worked connection.</h2><p className="learning-example-question">{example.question}</p><ol className="learning-example-steps">{example.steps.map(([math,why],i)=><li key={i}><span className="learning-number">{i+1}</span><div><p className="learning-math">{math}</p><p><strong>Why:</strong> {why}</p></div></li>)}</ol><p className="learning-reflect">Explain the connection in your own words, then try the changing examples below.</p></article>;
+ return <article className="lesson-panel learning-example" id={`reason-${topic.id}`}><span className="eyebrow">SEE THE REASONING</span><h2>A worked connection.</h2><p className="learning-example-question">{example.question}</p><ol className="learning-example-steps">{example.steps.map(([math,why],i)=><li key={i}><span className="learning-number">{i+1}</span><div><p className="learning-math">{math}</p><p><strong>Why:</strong> {why}</p></div></li>)}</ol><div className="math-reason-check"><strong>How can you check your reasoning?</strong><p>Review each calculation, explain why the operation matches the question, and see if the result makes sense. A common mistake to avoid is: {topic.mistake}</p></div><p className="learning-reflect">Explain the connection in your own words, then try the changing examples below.</p></article>;
 }
 
 export function ConceptCheck({topic}:{topic:Topic}){
