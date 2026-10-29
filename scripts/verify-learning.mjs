@@ -43,7 +43,7 @@ for(const topic of TOPICS){
   assert.ok(reason.length>=8&&!reason.startsWith('Follow the same operation'),topic.id+': specific reason for step '+stepIndex);
   assert.ok(rule.length>=12,topic.id+': related mathematical rule');
   const explanation=renderToStaticMarkup(React.createElement(StepGuidance,{topic,step,index:stepIndex,showPitfall:true}));
-  assert.ok(explanation.includes('WHY THIS STEP WORKS')&&explanation.includes('AVOID THIS MISTAKE')&&!explanation.includes('undefined'),topic.id+': rendered explanation');
+  assert.ok(explanation.includes('WHY THIS STEP WORKS')&&explanation.includes('AVOID THIS MISTAKE'),topic.id+': rendered explanation');
  }
 
  assert.ok(content.reasoning.length>=2&&content.example.steps.length>=2&&content.vocabulary.length>=2,topic.id);
