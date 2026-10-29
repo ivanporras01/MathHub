@@ -100,7 +100,7 @@ export function buildExpressionQuestion(seed:number,level=1):Question{
   S('Distribute every factor','Expand from the innermost parentheses outward. Multiply every term, including constants.',formatTerms(terms),`What is the signed coefficient of the FIRST ${target}-term after expanding?`,numeric(first.coefficient)),
   S('Reorder and group like terms','Use the commutative property to reorder and the associative property to group. Keep each signed term intact.',groupedText(terms),`How many ${target}-terms appear after expanding, before combining?`,matches.length),
   S('Combine the requested coefficients','Like terms share the entire variable part. Add their coefficients; do not add their exponents.',`${matches.map(t=>`(${rationalText(t.coefficient)})`).join(' + ')} = ${rationalText(c[target])}`,`What is the coefficient of ${target}?`,numeric(c[target])),
-  S('Write the complete simplified expression','Keep all remaining variable families and the constant. A zero coefficient means that family cancels.',polynomial(c),'What is the constant term in the simplified expression? Enter 0 if there is none.',numeric(c[''])),
+  S('Write the complete simplified expression','This is the FINAL simplified expression after collecting terms. If every term cancels, the final answer is zero.',`Final simplified expression = ${polynomial(c)}`,'What is the constant term in the simplified expression? Enter 0 if there is none.',numeric(c[''])),
  ],formatExpression(expression),undefined,'Write the whole simplified expression in your work. Enter only the requested coefficient here; exact fractions are accepted.');
 }
 
