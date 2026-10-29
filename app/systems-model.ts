@@ -2,7 +2,7 @@ export type LinearSystem = {m1:number;b1:number;m2:number;b2:number};
 export type Method = 'graphing'|'substitution'|'elimination';
 export type Fraction = {n:number;d:number};
 export type SystemSolution = {kind:'one';x:Fraction;y:Fraction}|{kind:'none'|'infinite'};
-export type SolvingStep = {title:string;why:string;math:string[];cancelY?:boolean};
+export type SolvingStep = {title:string;why:string;math:string[];cancelY?:boolean;columns?:{label:string;first:string;second:string;result:string;why:string}[];checkpoint?:{question:string;options:string[];correct:number;why:string}};
 
 export const SYSTEM_PRESETS = [
  {id:'crossing',label:'One solution',system:{m1:1,b1:1,m2:-1,b2:5}},
@@ -46,7 +46,7 @@ export function solvingSteps(s:LinearSystem,method:Method):SolvingStep[]{
  const solution=solveSystem(s),one=solution.kind==='one';
  const eq1=lineEquation(s.m1,s.b1),eq2=lineEquation(s.m2,s.b2);
  const conclusion:SolvingStep=one?{
-  title:'Check both original equations',why:'The same ordered pair must satisfy BOTH equations. A point on just one line is not a system solution.',
+  title:'Verify BOTH original equations',why:'Substitute the SAME x into both original equations. Both must give the SAME y. Only then is the ordered pair a solution.',
   math:[`Line 1: ${substitutionCheck(s.m1,s.b1,solution.x)}`,`Line 2: ${substitutionCheck(s.m2,s.b2,solution.x)}`,`Both outputs equal y = ${fractionText(solution.y)}. Solution: ${resultText(solution)}.`]
  }:{title:solution.kind==='none'?'Recognize a contradiction':'Recognize an identity',
   why:solution.kind==='none'?'The slopes are equal but the intercepts differ. These parallel lines never meet; no ordered pair satisfies both equations.':'Both equations describe the same line. Every point on that line satisfies both equations; not every point in the plane does.',
@@ -62,15 +62,19 @@ export function solvingSteps(s:LinearSystem,method:Method):SolvingStep[]{
  const reduced=`${numberText(coefficient)}x = ${numberText(constant)}`;
  const steps:SolvingStep[]=method==='substitution'?[
   {title:'Choose the expression to substitute',why:'Equation 1 already isolates y. Replace y in Equation 2 with that entire expression.',math:[`Equation 1: ${eq1}`,`Equation 2: ${eq2}`,`Replace y with (${linearExpression(s.m1,s.b1)}).`]},
-  {title:'Substitute and collect like terms',why:`Both expressions equal the same y. Subtract (${numberText(s.m2)})x and (${numberText(s.b1)}) from both sides.`,math:[`${linearExpression(s.m1,s.b1)} = ${linearExpression(s.m2,s.b2)}`,`(${numberText(s.m1)} − (${numberText(s.m2)}))x = ${numberText(s.b2)} − (${numberText(s.b1)})`,reduced]},
+  {title:'Set the y-expressions equal and collect like terms',why:'Both expressions equal the same y, so they are equal to each other. Move terms by doing the same operation on BOTH sides. Combine x-terms with x-terms and constants with constants.',math:[`${linearExpression(s.m1,s.b1)} = ${linearExpression(s.m2,s.b2)}`,`(${numberText(s.m1)} − (${numberText(s.m2)}))x = ${numberText(s.b2)} − (${numberText(s.b1)})`,reduced]},
  ]:[
-  {title:'Line up x, y, and the constants',why:'Rewrite each equation in standard form Ax + By = C. Keep each sign with its term.',math:[`Equation 1: ${standardEquation(-s.m1,1,s.b1)}`,`Equation 2: ${standardEquation(-s.m2,1,s.b2)}`]},
-  {title:'Make the y-coefficients opposites',why:'Multiply EVERY term of Equation 2, including its right side, by −1. Equation 1 stays the same.',math:[`Equation 1: ${standardEquation(-s.m1,1,s.b1)}`,`(−1) × Equation 2: ${standardEquation(s.m2,-1,-s.b2)}`]},
-  {title:'Add the equations to eliminate y',why:'Add the left sides and add the right sides. The opposite y-terms cancel because y + (−y) = 0.',math:[`${standardEquation(-s.m1,1,s.b1)}`,`+ (${standardEquation(s.m2,-1,-s.b2)})`,`(${numberText(-s.m1)} + (${numberText(s.m2)}))x + 0y = ${numberText(s.b1)} + (${numberText(-s.b2)})`,reduced],cancelY:true},
+  {title:'Align the x-terms, y-terms, and constants',why:'Rewrite each equation in Ax + By = C form. Put x under x and y under y, and keep every negative sign. Plan to eliminate one variable by ADDING opposite coefficients.',math:[`Equation 1: ${standardEquation(-s.m1,1,s.b1)}`,`Equation 2: ${standardEquation(-s.m2,1,s.b2)}`]},
+  {title:'Multiply the ENTIRE second equation by −1',why:'Both equations contain +y. To eliminate y by addition we need +y and −y. Multiply EACH term, including the number on the right, by −1. Multiplying both sides by the same nonzero number preserves the equation.',math:[`Equation 2 before: ${standardEquation(-s.m2,1,s.b2)}`,`(−1) × every term in Equation 2`,`Equation 2 after: ${standardEquation(s.m2,-1,-s.b2)}`,`Equation 1 stays: ${standardEquation(-s.m1,1,s.b1)`]},
+  {title:'Add matching columns to eliminate y',why:'Add x with x, y with y, and the right-side numbers together. Since +y and −y are opposites, they add to 0y. The y-variable disappears; the remaining equation contains x only.',math:[`Equation 1: ${standardEquation(-s.m1,1,s.b1)}`,`Scaled Equation 2: ${standardEquation(s.m2,-1,-s.b2)}`,`Combined equation: ${reduced}`],cancelY:true,columns:[
+ {label:'x-terms',first:`${numberText(-s.m1)}x`,second:`${numberText(s.m2)}x`,result:`${numberText(coefficient)}x`,why:'Add the signed x-coefficients.'},
+ {label:'y-terms',first:'+y',second:'−y',result:'0y',why:'Opposites cancel each other.'},
+ {label:'right sides',first:numberText(s.b1),second:numberText(-s.b2),result:numberText(constant),why:'Add numbers on the right.'}
+ ],checkpoint:{question:'What do +y and −y add up to?',options:['2y','0','−2y'],correct:1,why:'A positive y and a negative y have equal magnitude and opposite signs. Their sum is zero.'}},
  ];
  if(one){
-  steps.push({title:'Solve for x',why:`Divide both sides by ${numberText(coefficient)}. Keep the exact fraction if it does not simplify to a whole number.`,math:[reduced,`x = (${numberText(constant)}) ÷ (${numberText(coefficient)}) = ${fractionText(solution.x)}`]});
-  steps.push({title:'Substitute x to find y',why:'Use either ORIGINAL equation to find the other coordinate. Here we use Equation 1.',math:[eq1,`y = ${substitutionCheck(s.m1,s.b1,solution.x)}`,`(x, y) = ${resultText(solution)}`]});
+  steps.push({title:'Solve for x: divide BOTH sides',why:`Only one variable remains in ${reduced}. Divide both sides by ${numberText(coefficient)}, preserving equality. Remember negative ÷ negative = positive, and keep exact fractions.`,math:[reduced,`x = (${numberText(constant)}) ÷ (${numberText(coefficient)})`,`x = ${fractionText(solution.x)}`]});
+  steps.push({title:'Substitute x into the ORIGINAL equation to find y',why:'A system answer is an ordered pair (x, y). Replace x in Equation 1 with the x-value you just found and calculate y.',math:[`Original Equation 1: ${eq1}`,`Use x = ${fractionText(solution.x)}`,`y = ${substitutionCheck(s.m1,s.b1,solution.x)}`,`(x, y) = ${resultText(solution)}`]});
  }else steps.push({title:'Look at what remains',why:'The x-terms also cancel. Do not divide by zero. Decide whether the remaining statement is true or false.',math:[`0 = ${numberText(constant)}`,solution.kind==='none'?'False → no solution':'True → infinitely many solutions']});
  return [...steps,conclusion];
 }

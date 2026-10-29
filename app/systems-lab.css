@@ -13,3 +13,21 @@
 html[data-theme=dark] .systems-lab{--sys-blue:#87bdff;--sys-orange:#ffb56e;--sys-point:#d0a3ff}html[data-theme=dark] .sys-graph .sys-badge-text{fill:#10232d}
 @media(max-width:1050px){.sys-explorer{grid-template-columns:1fr}.sys-equations{grid-template-columns:repeat(2,minmax(0,1fr))}.sys-graph-panel{width:100%;max-width:640px;justify-self:center}}
 @media(max-width:540px){.sys-equations{grid-template-columns:1fr}.sys-methods{gap:5px}.sys-methods button{padding:10px 5px;text-align:center}.sys-methods b{font-size:12px}.sys-steps li{padding:12px;gap:8px}.sys-step-math{font-size:15px}.sys-step-controls{flex-wrap:wrap}.sys-step-controls>span{order:3;flex-basis:100%;text-align:center}.sys-answer-pair{grid-template-columns:1fr}.sys-equation{font-size:24px}.sys-graph-panel{padding:6px}.sys-legend{gap:12px;font-size:11px}}
+
+/* Explain elimination through separate signed columns instead of unexplained crossing-out. */
+.sys-column-work{margin:14px 0 0;border:1px solid var(--line);background:var(--white);padding:16px;border-radius:12px}
+.sys-column-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.sys-column-grid>section{min-width:0;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--paper)}
+.sys-column-grid h4{font-size:13px;margin-bottom:9px}
+.sys-column-term{font:650 20px/1.6 'Cambria Math',Cambria,serif;overflow-wrap:anywhere}
+.sys-column-total{font:800 22px/1.5 'Cambria Math',Cambria,serif;border-top:2px solid var(--green);color:var(--green);padding-top:7px}
+.sys-column-grid small{font-size:12px;line-height:1.6;color:var(--muted)}
+.sys-cancel-column{border-color:var(--sys-point)!important}.sys-cancel-column .sys-column-total{color:var(--sys-point)}
+.sys-column-conclusion{font-weight:650}
+.sys-checkpoint{border:1px solid var(--line);border-radius:12px;background:var(--white);padding:15px;margin-top:14px}
+.sys-checkpoint h4{font-size:16px;margin-bottom:6px}
+.sys-checkpoint-choices{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0}
+.sys-checkpoint-choices button{padding:9px 14px;border:1px solid var(--line);border-radius:9px;background:var(--paper)}
+.sys-checkpoint-choices button[aria-pressed=true]{border-color:var(--green);background:var(--mint);font-weight:700}
+.sys-check-right{color:var(--green);font-weight:650}.sys-check-retry{color:var(--text);font-weight:650}
+@media(max-width:600px){.sys-column-grid{grid-template-columns:1fr}}
