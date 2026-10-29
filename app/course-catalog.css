@@ -1,0 +1,22 @@
+/* Progressive topic groups; original topic card art and mastery UI are unchanged. */
+.course-catalog{margin-top:19px}
+.course-route-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;background:var(--white);border:1px solid var(--line);border-radius:15px;padding:21px 23px;margin-bottom:19px}
+.course-route-heading h3{font-size:20px;margin:6px 0}.course-route-heading p{font-size:13px;line-height:1.6;color:var(--muted);max-width:780px}.course-route-heading .button{flex-shrink:0;white-space:normal}
+.course-route-filters{display:flex;gap:9px;overflow-x:auto;padding:2px 1px 14px;margin-bottom:8px;scrollbar-width:thin}
+.course-route-filters button{background:var(--white);border:1px solid var(--line);padding:10px 14px;border-radius:100px;font-weight:650;font-size:12px;line-height:1.4;max-width:300px;text-align:left;flex-shrink:0}
+.course-route-filters button.selected{background:#164c49;color:white;border-color:#164c49}
+.course-route-filters button:focus-visible,.course-route-start:focus-visible,.course-route-focus summary:focus-visible{outline:3px solid #aeba83;outline-offset:3px}
+.course-route-unit{min-width:0;margin:0 0 34px}.course-route-unit-header{display:flex;align-items:center;gap:17px;flex-wrap:wrap;background:var(--white);border:1px solid var(--line);border-radius:13px;padding:18px 19px;margin-bottom:14px}
+.course-route-step{min-width:64px;color:#17685f;letter-spacing:.12em;font-size:11px;font-weight:750}
+.course-route-unit-copy{flex:1 1 230px;min-width:0}.course-route-unit-copy h3{font-size:20px;margin-bottom:4px}.course-route-unit-copy p{font-size:13px;color:var(--muted);line-height:1.5}
+.course-route-status{display:grid;gap:6px;min-width:110px;font-size:12px;font-weight:650}.course-route-meter{height:7px;border-radius:99px;background:#dfe7e0;overflow:hidden}.course-route-meter i{display:block;height:100%;background:#318272;border-radius:99px}
+.course-route-start{display:inline-flex;justify-content:center;align-items:center;gap:8px;padding:10px 13px;border:1px solid #aac3b7;border-radius:9px;background:#eef5ee;color:#205e50;font-size:12px;font-weight:700}
+.course-route-unit .topics-grid{margin:0 0 12px}
+.course-route-focus{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:0 16px;margin-top:12px}
+.course-route-focus summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 3px;cursor:pointer;list-style:none;font-weight:750}
+.course-route-focus summary::-webkit-details-marker{display:none}
+.course-route-focus summary span{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.course-route-focus summary small{font-size:12px;font-weight:500;color:var(--muted)}
+.course-route-focus[open] summary>svg:last-child{transform:rotate(180deg)}.course-route-focus .topics-grid{padding:2px 0 17px}
+.skill-practice-card{border-style:dashed}.course-route-empty{text-align:center;padding:28px 18px}.course-route-empty-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+@media(max-width:760px){.course-route-heading{flex-direction:column;align-items:stretch;padding:18px}.course-route-heading .button{width:100%;justify-content:center}.course-route-unit-header{align-items:flex-start}.course-route-step{width:100%}.course-route-unit-copy{flex-basis:100%}.course-route-status{flex:1}.course-route-start{flex:1}.course-route-filters button{padding:10px 12px}}

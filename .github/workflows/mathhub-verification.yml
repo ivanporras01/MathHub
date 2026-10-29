@@ -22,6 +22,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: TypeScript
         run: pnpm run typecheck:cloudflare
+      - name: Verify 75-topic learning pathway
+        run: node scripts/verify-learning-path.mjs
       - name: Render lessons and verify new mathematical models
         run: |
           node scripts/verify-learning.mjs

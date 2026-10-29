@@ -1,0 +1,287 @@
+{
+  "6": [
+    {
+      "id": "number-foundations",
+      "title": "Number foundations",
+      "summary": "Build number sense before mixing operations.",
+      "topics": [
+        "6-factors",
+        "6-integers",
+        "6-order",
+        "6-fractions",
+        "6-fraction-product"
+      ]
+    },
+    {
+      "id": "rates-percent",
+      "title": "Ratios, percents & measurement",
+      "summary": "Connect quantities with everyday contexts.",
+      "topics": [
+        "6-ratios",
+        "6-percent",
+        "6-conversions"
+      ]
+    },
+    {
+      "id": "algebra-grid",
+      "title": "Variables & the coordinate plane",
+      "summary": "Use expressions, equations, and points on a grid.",
+      "topics": [
+        "6-equations",
+        "6-coordinate"
+      ]
+    },
+    {
+      "id": "shapes-data",
+      "title": "Shapes & data",
+      "summary": "Measure figures and explain data patterns.",
+      "topics": [
+        "6-geometry",
+        "6-statistics"
+      ]
+    }
+  ],
+  "7": [
+    {
+      "id": "rational-foundations",
+      "title": "Rational number foundations",
+      "summary": "Operate with positive, negative, and fractional numbers.",
+      "topics": [
+        "7-integers",
+        "7-rational"
+      ]
+    },
+    {
+      "id": "proportional-thinking",
+      "title": "Proportions & real-world percent",
+      "summary": "Connect rates, scale drawings, discounts, and percent change.",
+      "topics": [
+        "7-proportions",
+        "7-scale",
+        "7-percent"
+      ]
+    },
+    {
+      "id": "algebra-thinking",
+      "title": "Expressions, equations & inequalities",
+      "summary": "Simplify, solve, and represent solution sets.",
+      "topics": [
+        "7-expressions",
+        "7-equations",
+        "7-inequalities"
+      ]
+    },
+    {
+      "id": "geometry-measurement",
+      "title": "Geometry & measurement",
+      "summary": "Work with angles, circles, and solid figures.",
+      "topics": [
+        "7-geometry",
+        "7-solids"
+      ]
+    },
+    {
+      "id": "chance",
+      "title": "Probability & multiple events",
+      "summary": "Move from single events to sequences.",
+      "topics": [
+        "7-probability",
+        "7-compound"
+      ]
+    }
+  ],
+  "8": [
+    {
+      "id": "foundations",
+      "title": "Pre-Algebra foundations",
+      "summary": "Practice powers, roots, substitution, and distribution.",
+      "topics": [
+        "8-exponents",
+        "8-roots",
+        "8-evaluate",
+        "8-distribute"
+      ]
+    },
+    {
+      "id": "solving",
+      "title": "Equations & inequalities",
+      "summary": "Keep relationships balanced and describe solutions.",
+      "topics": [
+        "8-equations",
+        "8-inequalities"
+      ]
+    },
+    {
+      "id": "linear-models",
+      "title": "Functions, lines & systems",
+      "summary": "Use functions, slopes, and intersections.",
+      "topics": [
+        "8-functions",
+        "8-slope",
+        "8-systems"
+      ]
+    },
+    {
+      "id": "geometry",
+      "title": "Geometry & transformations",
+      "summary": "Move shapes and reason with right triangles.",
+      "topics": [
+        "8-transformations",
+        "8-pythagorean"
+      ]
+    },
+    {
+      "id": "applications",
+      "title": "Applied percent",
+      "summary": "Use percent in practical questions.",
+      "topics": [
+        "8-percent"
+      ]
+    }
+  ],
+  "9": [
+    {
+      "id": "algebra-basics",
+      "title": "Algebraic reasoning",
+      "summary": "Simplify expressions, solve equations, and use inequalities.",
+      "topics": [
+        "9-expressions",
+        "9-equations",
+        "9-inequalities"
+      ]
+    },
+    {
+      "id": "functions-lines",
+      "title": "Functions & linear models",
+      "summary": "Connect function notation, slope, and systems.",
+      "topics": [
+        "9-functions",
+        "9-slope",
+        "9-lines",
+        "9-systems"
+      ]
+    },
+    {
+      "id": "polynomials-quadratics",
+      "title": "Polynomials & quadratics",
+      "summary": "Build from exponent rules to factoring and graphs.",
+      "topics": [
+        "9-exponents",
+        "9-polynomials",
+        "9-factoring",
+        "9-quadratics"
+      ]
+    },
+    {
+      "id": "growth",
+      "title": "Exponential patterns",
+      "summary": "Model multiplicative growth and decay.",
+      "topics": [
+        "9-exponential"
+      ]
+    }
+  ],
+  "10": [
+    {
+      "id": "function-connections",
+      "title": "Function families & operations",
+      "summary": "Learn transformations, compositions, and inverses.",
+      "topics": [
+        "10-transformations",
+        "10-composition",
+        "10-inverses"
+      ]
+    },
+    {
+      "id": "polynomial-studio",
+      "title": "Polynomials: one connected studio",
+      "summary": "Start with all four operations, then practice a specific skill.",
+      "topics": [
+        "10-division",
+        "10-zeros"
+      ],
+      "focus": [
+        "10-addition",
+        "10-subtraction",
+        "10-multiplication"
+      ]
+    },
+    {
+      "id": "quadratic-tools",
+      "title": "Quadratics & complex numbers",
+      "summary": "Solve harder equations with completing the square and complex numbers.",
+      "topics": [
+        "10-completing-square",
+        "10-complex"
+      ]
+    },
+    {
+      "id": "rational-radical",
+      "title": "Rational & radical functions",
+      "summary": "Explore asymptotes, intercepts, holes, radicals, and domains.",
+      "topics": [
+        "10-rational",
+        "10-radicals"
+      ]
+    },
+    {
+      "id": "exponentials-log",
+      "title": "Exponential & logarithmic models",
+      "summary": "Apply logarithmic thinking to exponential equations.",
+      "topics": [
+        "10-exponential",
+        "10-logarithms"
+      ]
+    },
+    {
+      "id": "nonlinear",
+      "title": "Nonlinear systems",
+      "summary": "Understand where different function families intersect.",
+      "topics": [
+        "10-nonlinear-systems"
+      ]
+    }
+  ],
+  "11": [
+    {
+      "id": "geometry-foundations",
+      "title": "Coordinate & angle foundations",
+      "summary": "Use distance, angle relationships, and parallel lines.",
+      "topics": [
+        "11-coordinates",
+        "11-angles",
+        "11-parallel"
+      ]
+    },
+    {
+      "id": "triangles-transform",
+      "title": "Triangles, congruence & similarity",
+      "summary": "Connect triangle evidence with transformations and scale.",
+      "topics": [
+        "11-triangle-angles",
+        "11-congruence",
+        "11-transformations",
+        "11-similarity"
+      ]
+    },
+    {
+      "id": "right-triangles",
+      "title": "Right triangles & trigonometry",
+      "summary": "Apply the Pythagorean theorem and trigonometric ratios.",
+      "topics": [
+        "11-pythagorean",
+        "11-trigonometry"
+      ]
+    },
+    {
+      "id": "shapes-circles",
+      "title": "Polygons, circles & measurement",
+      "summary": "Understand shape properties, circles, area, and volume.",
+      "topics": [
+        "11-quadrilaterals",
+        "11-circles",
+        "11-measurement"
+      ]
+    }
+  ]
+}

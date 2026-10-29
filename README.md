@@ -125,3 +125,11 @@ Students compare `1/x`, `1/x²`, and `x²` with their transformations, change ve
 Practice checks asymptotes, intercepts, domain exclusions, holes, range, and applicable end-behavior guides. Students can plot and check their own points before revealing the curve. Feedback is specific to each feature; exploration completion is counted for the current session. These self-checks do not replace the existing Guided and Independent stages that record course progress.
 
 `node scripts/verify-graphing.mjs` independently verifies the 22 examples, 439 range checks, 540 transformation configurations, safe answer parsing, discontinuity rendering, and 47 rendered studio states. The existing advanced-math verification script also runs these checks. `npm run dev` accepts standard preview host/port flags through a small Wrangler adapter.
+
+## Guided learning pathways and overlap review (October 2026)
+
+MathHub now presents its original 75 topic IDs in progressive, subject-based units without changing the underlying TOPICS array or student question seeds. Each course includes selectable units, per-unit mastery, a clear next unfinished lesson, and searchable lessons with the existing interactive explorations.
+
+Algebra 2 introduces one main **Operations with Polynomials** studio; focused addition, subtraction, and multiplication lessons now appear inside an expandable practice group. Each original lesson, saved score, assignment, teacher record, and deep link remains valid. Related topics across different grades remain intentionally separate to scaffold more advanced mathematics.
+
+Navigation sources: `app/learning-path-data.json`, `app/learning-path.ts`, `app/course-catalog.tsx`. Regression: `node scripts/verify-learning-path.mjs`.
