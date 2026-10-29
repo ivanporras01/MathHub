@@ -26,6 +26,9 @@ const load=name=>import(pathToFileURL(path.join(out,`${name}.mjs`)));
 const {TOPICS}=await load('curriculum');
 const {LEARNING_CONTENT}=await load('learning-content/index');
 const {default:Lesson}=await load('lesson');
+const {StepGuidance,clearStepReason,connectedRule}=await load('step-guidance');
+const {generateQuestion}=await load('question-engine');
+const {solveSystem,solvingSteps,value}=await load('systems-model');
 const {default:ParallelLab}=await load('parallel-lines-lab');
 const {ANGLE_PAIRS,angleMeasures,parallelIntersections}=await load('parallel-model');
 const {conceptLab}=await load('concept-models');
@@ -33,6 +36,16 @@ assert.deepEqual(Object.keys(LEARNING_CONTENT).sort(),TOPICS.map(t=>t.id).sort()
 let rendered=0;
 for(const topic of TOPICS){
  const content=LEARNING_CONTENT[topic.id];
+ const example=generateQuestion(topic.id,81293+TOPICS.indexOf(topic)*7937+38472,1);
+ assert.ok(example.steps.length>=2,topic.id+': worked examples need multiple steps');
+ for(const [stepIndex,step] of example.steps.entries()){
+  const reason=clearStepReason(topic,step,stepIndex),rule=connectedRule(topic,step,stepIndex);
+  assert.ok(reason.length>=8&&!reason.startsWith('Follow the same operation'),topic.id+': specific reason for step '+stepIndex);
+  assert.ok(rule.length>=12,topic.id+': related mathematical rule');
+  const explanation=renderToStaticMarkup(React.createElement(StepGuidance,{topic,step,index:stepIndex,showPitfall:true}));
+  assert.ok(explanation.includes('WHY THIS STEP WORKS')&&explanation.includes('AVOID THIS MISTAKE')&&!explanation.includes('undefined'),topic.id+': rendered explanation');
+ }
+
  assert.ok(content.reasoning.length>=2&&content.example.steps.length>=2&&content.vocabulary.length>=2,topic.id);
  assert.equal(new Set(content.check.options.map(o=>o[0])).size,content.check.options.length,`${topic.id}: distinct answer choices`);
  assert.ok(content.check.options[content.check.correct]?.[1],`${topic.id}: explanatory feedback`);
@@ -42,6 +55,27 @@ for(const topic of TOPICS){
  if(topic.id==='11-parallel'||topic.id==='10-radicals')await writeFile(path.join(out,`${topic.id}.html`),html);
  rendered++;
 }
+// Verify cancellation, equality, and feedback across all slider coefficients.
+let systemChecks=0;
+for(let m1=-3;m1<=3;m1++)for(let m2=-3;m2<=3;m2++)for(let b1=-2;b1<=2;b1++)for(let b2=-2;b2<=2;b2++){
+ const system={m1,m2,b1,b2},solution=solveSystem(system);
+ const elimination=solvingSteps(system,'elimination'),columns=elimination[2].columns;
+ assert.equal(columns?.length,3,'Elimination has x/y/constant columns');
+ assert.equal(columns[0].result.replace('−','-'),String(m2-m1)+'x');
+ assert.equal(columns[1].result,'0y');
+ assert.equal(columns[2].result.replace('−','-'),String(b1-b2));
+ assert.ok(elimination[2].checkpoint?.question.includes('add up'));
+ if(solution.kind==='one'){
+  const x=value(solution.x),y=value(solution.y);
+  assert.ok(Math.abs(y-(m1*x+b1))<1e-9);
+  assert.ok(Math.abs(y-(m2*x+b2))<1e-9);
+ }
+ assert.ok(solvingSteps(system,'substitution').length>=4);
+ assert.equal(solvingSteps(system,'graphing').length,4);
+ systemChecks++;
+}
+console.log('PASS: '+systemChecks+' system equations verify elimination columns and correct intersections.');
+
 // Independently recover the acute/obtuse sector from vector bearings, and verify
 // the drawn intersections lie on both geometric lines for every slider step.
 const close=(a,b)=>assert.ok(Math.abs(a-b)<1e-8,`${a} ≠ ${b}`);
