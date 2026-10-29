@@ -1,0 +1,9 @@
+/* Consistent why/how/check cues across all MathHub courses. */
+.step-guidance{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;margin:12px 0 4px}
+.step-guidance>div{border:1px solid var(--line);background:var(--white);border-radius:10px;padding:12px 14px;min-width:0}
+.step-guide-heading{display:flex;align-items:center;gap:7px;color:var(--green);font-size:10px;letter-spacing:.07em;line-height:1.4}
+.step-guidance p{margin-top:7px!important;font-size:13px!important;line-height:1.75!important;color:var(--text)!important}
+.step-guidance .step-guide-pitfall{border-left:3px solid #b77b29;background:var(--paper)}
+.vw-step-sense{margin-top:14px}.vw-step-sense b{display:block;color:var(--green);font-size:12px}.vw-step-sense p{margin:4px 0 0;line-height:1.65}
+.math-reason-check{border:1px solid var(--line);background:var(--paper);padding:14px 16px;border-radius:12px;margin:16px 0}
+.math-reason-check strong{display:block;margin-bottom:5px;color:var(--green)}.math-reason-check p{font-size:13px!important;line-height:1.7!important;margin:0!important}
