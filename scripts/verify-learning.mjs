@@ -55,6 +55,31 @@ for(const topic of TOPICS){
  if(topic.id==='11-parallel'||topic.id==='10-radicals')await writeFile(path.join(out,`${topic.id}.html`),html);
  rendered++;
 }
+// Broad, reproducible audit of all six courses and every difficulty level.
+// These are NEW practice examples. Stored issued questions are not changed.
+let questionCases=0;
+const missingAnswerSteps=new Map();
+const formatFaults=new Map();
+for(const topic of TOPICS){
+ for(let level=1;level<=3;level++)for(let seed=0;seed<125;seed++){
+  const q=generateQuestion(topic.id,seed*101+level*9973,level);
+  assert.ok(q.prompt.length>=8&&q.hint.length>=8,topic.id+': missing question or teaching hint');
+  assert.ok(Number.isFinite(q.answer),topic.id+': non-finite final answer');
+  assert.ok(q.steps.length>=2,topic.id+': too few solution steps');
+  const numbers=q.steps.map(st=>st.answer);
+  for(const [i,st] of q.steps.entries()){
+   assert.ok(st.title.length>=3&&st.text.length>=10&&st.math.length>=3&&st.ask.length>=6,topic.id+': incomplete step '+i);
+   assert.ok(Number.isFinite(st.answer),topic.id+': invalid step answer '+i);
+   if(/\\bNaN\\b|\\bInfinity\\b/.test(st.math)){formatFaults.set(topic.id,(formatFaults.get(topic.id)||0)+1);}
+  }
+  if(!numbers.some(n=>Math.abs(n-q.answer)<=1e-8*Math.max(1,Math.abs(n),Math.abs(q.answer))))
+   missingAnswerSteps.set(topic.id,(missingAnswerSteps.get(topic.id)||0)+1);
+  questionCases++;
+ }
+}
+assert.equal(formatFaults.size,0,'Generated math contains invalid values: '+JSON.stringify([...formatFaults]));
+console.log('AUDIT: '+questionCases+' question variants across '+TOPICS.length+' topics, three difficulties; answer-step gaps: '+JSON.stringify([...missingAnswerSteps]));
+
 // Verify cancellation, equality, and feedback across all slider coefficients.
 let systemChecks=0;
 for(let m1=-3;m1<=3;m1++)for(let m2=-3;m2<=3;m2++)for(let b1=-2;b1<=2;b1++)for(let b2=-2;b2<=2;b2++){
