@@ -18,7 +18,7 @@ export function generateHighSchoolQuestion(id:string,seed:number,level=1):Questi
    subtract?'Change every sign in the second polynomial, then combine the matching powers.':'Align matching powers and add their signed coefficients.',
    [S(subtract?'Change every sign':'Keep the signed terms',subtract?'Multiply the entire second polynomial by −1.':'Addition preserves the signs of the second polynomial.',polynomial(adjusted,true),'What is its coefficient of x^'+target+'?',adjusted[target]),
     S('Combine the requested column','Add coefficients without changing the exponent.',first[target]+' + ('+adjusted[target]+') = '+answer,'What is the coefficient of x^'+target+'?',answer),
-    S('Write the full result','Combine every column and omit zero terms.',polynomial(combined),'What is the requested coefficient?',answer)],
+    S('Write the full result','Combine every column and omit zero terms. Label the simplified polynomial clearly, including zero when all terms cancel.','Simplified polynomial: '+polynomial(combined),'What is the requested coefficient?',answer)],
    '('+polynomial(first,true)+') '+(subtract?'−':'+')+' ('+polynomial(second,true)+')',undefined,'x^0 means the constant term. Enter only the requested numeric coefficient.');
  }
 
